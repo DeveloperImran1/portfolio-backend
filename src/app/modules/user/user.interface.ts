@@ -25,9 +25,9 @@ export interface IUser {
   phone?: string;
   picture?: string;
   address?: string;
-  isDeleted?: string;
+  isDeleted?: boolean;
   isActive?: IsActive;
-  isVerified?: string;
+  isVerified?: boolean;
   role: Role;
   auths: IAuthProvider[]; // amader website a sudho google and email-pass ai 2way te login korte parbe. Kiso kiso user ase, jara email dia login kore, edit profile theke password set kore, tai auths property er value akta array hobe. Kono use jodi google dia login kore, tahole google info thakbe 1st index a. Ar 2nd index a email-pass er info thakbe.
   bookings?: Types.ObjectId[];

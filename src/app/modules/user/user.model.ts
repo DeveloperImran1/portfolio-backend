@@ -12,7 +12,7 @@ const authProviderSchema = new Schema<IAuthProvider>(
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
     password: { type: String },
     phone: { type: String },
     picture: { type: String },
@@ -25,12 +25,14 @@ const userSchema = new Schema<IUser>(
     },
     isVerified: { type: Boolean, default: false },
     role: { type: String, enum: Object.values(Role), default: Role.USER },
-    auths: [authProviderSchema],
+    auths: {
+      type: [authProviderSchema],
+    },
     // bookings and guides er schema akhono create kora hoini. tai tader value set kora jassena. Karon reference kora lagbe.
     // bookings: {},
     // guides: {}
   },
-  { versionKey: false, _id: false }
+  { versionKey: false, timestamps: true }
 );
 
 export const User = model<IUser>("User", userSchema);
