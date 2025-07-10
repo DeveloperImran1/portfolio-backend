@@ -12,7 +12,7 @@ const startServer = async () => {
     await mongoose.connect(uri);
     console.log("MongoDB is connected!!");
 
-    server = app.listen(5000, () => {
+    server = app.listen(envVars.PORT, () => {
       console.log(`Server is listening on port ${envVars.PORT}`);
     });
   } catch (error) {
@@ -90,7 +90,7 @@ process.on("SIGINT", () => {
 });
 
 /**
- * Total 3 type of error in backend 
+ * Total 3 type of error in backend server related
  * 1. Unhandeld rejection error --> asynchronous, promise related kono error hoiase, but seitake jodi try catch er maddhome error handle na kori. Tahole take handle korte hobe.
  
  * 2. Uncaught exception error --> Amader code er moddhe syntax or common error gulo hoi. Like variable name declare korini, but oi variable use kortesi. Sei error ke try catch er maddhome handle na korle, last a uncaught exception er maddhome handle korte pari.
