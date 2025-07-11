@@ -13,10 +13,20 @@ interface EnvConfig {
   PORT: string;
   DB_URL: string;
   NODE_ENV: "development" | "production"; // ai 2ta valuer moddhei hote hobe.
+  JWT_ACCESS_SECRET: string;
+  JWT_ACCESS_EXPIRES: string;
+  BCRYPT_SALT_ROUND: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
-  const requiredEnvVariables: string[] = ["PORT", "DB_URL", "NODE_ENV"];
+  const requiredEnvVariables: string[] = [
+    "PORT",
+    "DB_URL",
+    "NODE_ENV",
+    "JWT_ACCESS_SECRET",
+    "JWT_ACCESS_EXPIRES",
+    "BCRYPT_SALT_ROUND",
+  ];
 
   // array ke map kore key gulo nissa. Jodi requiredEnvVariables array er kono key .env file er moddhe na thake, tahole error through korbe.
   requiredEnvVariables.forEach((key) => {
@@ -30,6 +40,9 @@ const loadEnvVariables = (): EnvConfig => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     DB_URL: process.env.DB_URL!, // last a ! or not symbol dewa mane, ai line er type nia error dibana. and uporer line er comment ta holo: eslint er error ke stop kora hoiase, ai line er jonno.
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
+    JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
+    BCRYPT_SALT_ROUND: process.env.BCRYPT_SALT_ROUND as string,
   };
 };
 
