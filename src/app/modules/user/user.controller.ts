@@ -45,6 +45,32 @@ const createUser = catchAsync(
   }
 );
 
+const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    const payload = req.body;
+
+    // const token = req.headers.authorization as string;
+    // const verifiedToken = verifyToken(
+    //   token,
+    //   envVars.JWT_ACCESS_SECRET
+    // ) as JwtPayload;
+
+    // checkAuth.ts file a verifiedToken token ke req.user property er moddhe set koresi. Jar fole uporer moto kore abar verify na kore req.user theke nita partesi.
+    const verifiedToken = req.user;
+
+    const user = await UserServices.updateUser(userId, payload, verifiedToken);
+
+    // sendResponse utils using res send
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User Updated Successfully",
+      data: user,
+    });
+  }
+);
+
 // get all users
 const getAllUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -64,4 +90,5 @@ const getAllUser = catchAsync(
 export const UserControllers = {
   createUser,
   getAllUser,
+  updateUser,
 };

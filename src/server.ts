@@ -2,6 +2,7 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 import { envVars } from "./config/env";
 
 let server: Server;
@@ -20,7 +21,11 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Jokhon jokhon server run hobe tokhon seedSuperAdmin function tao call hobe. Tobe ensure korte hobe server start hower pore seedSuperAdmin call hobe. Tai async await use koreci. Jotokkhon na porjonto server start hobena. totokkhon porjonto next line a jabena. Ar ai 2ta method ke IIFE function er moddhe rakhe, automatic call koreci.
+(async () => {
+  await startServer();
+  await seedSuperAdmin(); // aikhane seedSuperAdmin function er kaj holo. Jodi DB te super admin na thake. Tahole akta super admin create korbe. Ar jodi already exist thake. Tahole ar superAdmin create korbena.
+})();
 
 // Unhandeld rejection error
 process.on("unhandledRejection", (err) => {

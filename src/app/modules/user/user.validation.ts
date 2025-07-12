@@ -73,5 +73,5 @@ export const updateUserZodSchema = z.object({
     .optional(),
   //  name: string;
 
-  //   picture?: string;
+  //  picture?: string;
 });
