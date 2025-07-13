@@ -49,6 +49,7 @@ const updateUser = async (
 
   // user exist naki, check korbo
   const isUserExist = await User.findById(userId);
+
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User not exist");
   }

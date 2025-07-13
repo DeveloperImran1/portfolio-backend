@@ -1,8 +1,13 @@
-import bcryptjs from "bcryptjs";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import bcrypt from "bcryptjs";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import { generateToken } from "../../utils/jwt";
+import {
+  createNewAccessTokenWithRefreshToken,
+  createUserTokens,
+} from "../../utils/userTokens";
 import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 
@@ -14,7 +19,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     throw new AppError(httpStatus.BAD_REQUEST, "User not found");
   }
 
-  const isPasswordMatched = await bcryptjs.compare(
+  const isPasswordMatched = await bcrypt.compare(
     password as string,
     isUserExist.password as string
   );
@@ -23,19 +28,56 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     throw new AppError(httpStatus.BAD_GATEWAY, "Invalid Password");
   }
 
-  // Token create
-  const jwtPayload = {
-    email: isUserExist.email,
-    role: isUserExist.role,
-    userId: isUserExist._id,
-  };
+  //  token create
+  const userToken = createUserTokens(isUserExist);
 
-  const accessToken = generateToken(
-    jwtPayload,
-    envVars.JWT_ACCESS_SECRET,
-    envVars.JWT_ACCESS_EXPIRES
-  );
-  return { email: isUserExist.email, token: accessToken };
+  // isUserExist er moddhe user er all data ase. But password front-end a send na korai better. Tai isUserExist theke password property ke delete korbo.
+  const { password: pass, ...rest } = isUserExist.toObject();
+
+  // user login korar pore ai object ta front-end a jabe. ai token gulo nia cookie te set kora rakhte  hobe.
+  return {
+    accessToken: userToken.accessToken,
+    refreshToken: userToken.refreshToken,
+    user: rest,
+  };
 };
 
-export const AuthServices = { credentialsLogin };
+// new token generate using refresh token
+const getNewAccessToken = async (refreshToken: string) => {
+  // refresh token dia new akta token create korar kaj ta utils > userTokens.ts file er moddhe akta function a koreci.
+  const accessToken = await createNewAccessTokenWithRefreshToken(refreshToken);
+  return {
+    accessToken,
+  };
+};
+
+const resetPassword = async (
+  oldPassword: string,
+  newPassword: string,
+  decodedToken: JwtPayload
+) => {
+  const user = await User.findById(decodedToken.userId);
+
+  const isOldPasswordMatch = await bcrypt.compare(
+    oldPassword,
+    user?.password as string
+  );
+
+  if (!isOldPasswordMatch) {
+    throw new AppError(httpStatus.FORBIDDEN, "Your old password not matched!");
+  }
+
+  // aikhane user null hobena, aita bujhar jonno not null assertion symbol (!) use koreci. ar hash kora password ke user.password er moddhe bose, save() kore diasi.
+  user!.password = await bcrypt.hash(
+    newPassword,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  );
+
+  user!.save();
+};
+
+export const AuthServices = {
+  credentialsLogin,
+  getNewAccessToken,
+  resetPassword,
+};
