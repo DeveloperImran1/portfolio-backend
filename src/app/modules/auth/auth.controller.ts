@@ -2,6 +2,7 @@
 
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import passport from "passport";
 import { envVars } from "../../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { catchAsync } from "../../utils/catchAsync";
@@ -12,17 +13,46 @@ import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const loginInfo = await AuthServices.credentialsLogin(req.body);
+    // AuthServices.credentialsLogin function er kajta nicher passport.ts file er maddhome kora hoiase. Tai ai line comment koresi.
+    // const loginInfo = await AuthServices.credentialsLogin(req.body);
 
-    // loginInfo er moddhe thaka accessToken and refreshToken ke cookie te set kortesi
-    setAuthCookie(res, loginInfo);
+    //credentialsLogin er maddhe jaja kortam, ta akhon passport.authentecation er moddhe korbo.
+    passport.authenticate("local", async (err: any, user: any, info: any) => {
+      if (err) {
+        // ❌❌❌❌ aivaime error throw kora jabena.
+        // throw new AppError(402, "Something went wrong")
+        // return new AppError(401, err);
+        // next(err)
 
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "User loged in successfull!",
-      data: loginInfo,
-    });
+        // ✅✅✅✅ aivabe error ke return korte hobe passport er moddhe theke
+        return next(err);
+        return next(new AppError(401, err));
+      }
+
+      if (!user) {
+        return next(new AppError(401, info.message));
+      }
+
+      // user thakle user er info dia token create
+      const userTokens = createUserTokens(user);
+
+      // cookie te set kortesi
+      setAuthCookie(res, userTokens);
+
+      // user theke password ke remove kortesi
+      const { password, ...rest } = user.toObject();
+
+      sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User loged in successfull!",
+        data: {
+          accessToken: userTokens.accessToken,
+          refreshToken: userTokens.refreshToken,
+          user: rest,
+        },
+      });
+    })(req, res, next); // credentials login aikhane middleware hisabe kaj kortese. but passport.authenticate() oi middleware er moddhe thaka arekti function. So aitake amader call korte hobe. Tasara hobena.
   }
 );
 

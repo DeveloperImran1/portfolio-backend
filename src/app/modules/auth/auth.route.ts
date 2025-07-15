@@ -33,7 +33,7 @@ router.get(
 // google dia login hower por, callback er api te hit korbe, so create kortesi. Ai api er moddhe jwt token, cookie etc create korbo and set korbo.
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
+  passport.authenticate("google", { failureRedirect: "/login" }), // Aikhane passport ta middleware hisabe use hosse. Ai middleware ke ami kinto call deini. Karon middleware ke call dewer kaj express kore thakbe. But uporer /google route a middleware er moddhe akta function ase. Tai expressJs middleware ke call korese. But oi middleware ba function er moddhe jodi aro akta function thake, seitake to express call korbena. Aijonnoi passport.authenticate()(req, res) aivabe call koresi.
   AuthControllers.googleCallbackcontroller
 );
 
