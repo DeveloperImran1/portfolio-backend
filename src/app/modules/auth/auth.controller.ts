@@ -2,10 +2,12 @@
 
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import { envVars } from "../../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { setAuthCookie } from "../../utils/setCookie";
+import { createUserTokens } from "../../utils/userTokens";
 import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(
@@ -99,9 +101,43 @@ const resetPassword = catchAsync(
   }
 );
 
+const googleCallbackcontroller = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // amra credential dia login korar somoi, req.user er moddhe user er data gulo set kore ditam. But config > passport.ts file a passport er maddhome login korai. Passport ai req.user namer akta propety er moddhe user er value set kore dei automatically.
+    const user = req.user;
+
+    // google dia login korar korar somoi route a state namer akta property er moddhe redirect path te set koreci, jar fole aikhane query theke state name a value ta pabo.
+    let redirectTo = req.query.state ? (req.query.state as string) : "";
+    if (redirectTo.startsWith("/")) {
+      redirectTo = redirectTo.slice(1);
+    }
+
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    // user thakle user er moddhe email, name, _id, role etc. ase. Oi user er value dia createUserTokens() function accessToken and refreshToken create kore diba.
+    const tokenInfo = createUserTokens(user);
+
+    // token create kora done, akhon ai token gulo cookie te set kore diba setAuthCookie function.
+    setAuthCookie(res, tokenInfo);
+
+    // sendResponse(res, {
+    //   success: true,
+    //   statusCode: httpStatus.OK,
+    //   message: "Password Reset Successfully",
+    //   data: null,
+    // });
+
+    // login hower pore front-end a res send korte hobena. redirect kore dilai hobe. Akhon redirectTo er value thakle user er exptectation route a redirect korbe. ar redirectTo empty string hole home page a redirect korbe.
+    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
+  }
+);
+
 export const AuthControllers = {
   credentialsLogin,
   getNewAccessToken,
   logout,
   resetPassword,
+  googleCallbackcontroller,
 };
