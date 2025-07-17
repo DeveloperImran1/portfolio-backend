@@ -36,7 +36,11 @@ export const globalErrorHandler = (
   ];
 
   // AppError class er moddhe jodi error object er property gulo thake, tahole statusCode and message variable er value change kore error.statusCode and error.message er value set kore dibo ba dynamic korbo.
-  console.log("Gobal error is ", error);
+
+  // amader project development a thaklei sudho ai console.log hose. Because production a ai console user dekhle issue hobe.
+  if (envVars.NODE_ENV === "development") {
+    console.log("Gobal error is ", error);
+  }
 
   // Mongoose Duplicate key error
   if (error.code === 11000) {
@@ -80,7 +84,7 @@ export const globalErrorHandler = (
     succuss: false,
     message,
     errorSources,
-    error,
+    error: envVars.NODE_ENV === "development" ? error : null,
     stack: envVars.NODE_ENV === "development" ? error.stack : null, // production a gele stack a null dekhabe. Tokhon error er details show hobena.
   });
 };
