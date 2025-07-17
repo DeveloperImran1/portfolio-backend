@@ -2,10 +2,16 @@ import z from "zod";
 import { IsActive, Role } from "./user.interface";
 
 export const createUserZodSchema = z.object({
-  name: z
-    .string({ invalid_type_error: "Name must have been string" })
-    .min(1, { message: "Name lenght is minimum 5" })
-    .max(100, { message: "Name length maximum 100" }),
+  name: z.object({
+    firstName: z
+      .string({ invalid_type_error: "Name must have been string" })
+      .min(1, { message: "Name lenght is minimum 5" })
+      .max(100, { message: "Name length maximum 100" }),
+    lastName: z
+      .string({ invalid_type_error: "Name must have been string" })
+      .min(1, { message: "Name lenght is minimum 5" })
+      .max(100, { message: "Name length maximum 100" }),
+  }),
   email: z
     .string({ invalid_type_error: "Email must have been string" })
     .email({ message: "Invalid email address format" })
