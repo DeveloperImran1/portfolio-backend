@@ -3,86 +3,88 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { TourServices } from "./tour.services";
+import { DivisionServices } from "./division.services";
 
-const createTour = catchAsync(
+const createDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await TourServices.createTour(req.body);
+    const division = await DivisionServices.createDivision(req.body);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
-      message: "Tour created successfully",
-      data: tour,
+      message: "Division created successfully",
+      data: division,
     });
   }
 );
 
-const getAllTour = catchAsync(
+const getAllDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // jodi kono object er moddhe kiki field thakbe, ta exactly na jani, tahole Record use korte pari.
-    const tour = await TourServices.getAllTour(
+    const division = await DivisionServices.getAllDivision(
       req.query as Record<string, string>
     );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Tour retrived successfully",
-      data: tour,
+      message: "Division retrived successfully",
+      data: division,
     });
   }
 );
 
-const getSingleTour = catchAsync(
+const getSingleDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const slug = req.params.slug;
-    const tour = await TourServices.getSingleTour(slug);
+    const division = await DivisionServices.getSingleDivision(slug);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Tour retrived successfully",
-      data: tour,
+      message: "Division retrived successfully",
+      data: division,
     });
   }
 );
 
-const updateTour = catchAsync(
+const updateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tourId = req.params.id;
+    const divisionId = req.params.id;
     const payload = req.body;
 
-    const tour = await TourServices.updateTour(tourId, payload);
+    const updateDivision = await DivisionServices.updateDivision(
+      divisionId,
+      payload
+    );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Tour updated successfully",
-      data: tour,
+      message: "Division updated successfully",
+      data: updateDivision,
     });
   }
 );
 
-const deleteTour = catchAsync(
+const deleteDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tourId = req.params.id;
+    const divisionId = req.params.id;
 
-    await TourServices.deleteTour(tourId);
+    await DivisionServices.deleteDivision(divisionId);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Tour Deleted Successfully",
+      message: "Division updated successfully",
       data: null,
     });
   }
 );
 
-export const TourController = {
-  createTour,
-  getAllTour,
-  updateTour,
-  deleteTour,
-  getSingleTour,
+export const DivisionController = {
+  createDivision,
+  getAllDivision,
+  updateDivision,
+  deleteDivision,
+  getSingleDivision,
 };

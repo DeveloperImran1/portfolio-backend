@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
@@ -57,7 +58,7 @@ const updateUser = catchAsync(
     // ) as JwtPayload;
 
     // checkAuth.ts file a verifiedToken token ke req.user property er moddhe set koresi. Jar fole uporer moto kore abar verify na kore req.user theke nita partesi.
-    const verifiedToken = req.user;
+    const verifiedToken: any = req.user;
 
     const user = await UserServices.updateUser(userId, payload, verifiedToken);
 
@@ -74,15 +75,29 @@ const updateUser = catchAsync(
 // get all users
 const getAllUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = await UserServices.getAllUser();
+    const data = await UserServices.getAllUser(
+      req.query as Record<string, string>
+    );
 
-    console.log("data is", data);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "User retrived Successfully",
-      data: data?.data,
-      meta: data?.meta,
+      data,
+    });
+  }
+);
+
+const getSingleUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const user = await UserServices.getSingleUser(id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User retrived successfully",
+      data: user,
     });
   }
 );
@@ -91,4 +106,5 @@ export const UserControllers = {
   createUser,
   getAllUser,
   updateUser,
+  getSingleUser,
 };

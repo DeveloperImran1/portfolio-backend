@@ -10,6 +10,8 @@ const router = Router();
 
 // [NOTE: zod ke validate korte hobe sudho post and update korar somoi. Karon req.body te sudho post and update method ai data ase.]
 
+// [NOTE: Remember routing korar somoi dynamic route, i mean jei route gulo /:id airokom dynamic route gulo ke sobar last a set korte hobe. Karon /: aikhane jekono kiso hote pare. So jodi top a ai dynamic route likhi, tahole hoardcoded porjonto jabena. So Top a hardcotate route then bottom a dynamic route set korte hobe]
+
 router.post(
   "/register",
   validateRequest(createUserZodSchema),
@@ -22,11 +24,17 @@ router.get(
   UserControllers.getAllUser
 );
 
+router.get(
+  "/:id",
+  checkAuth(...Object.values(Role)),
+  UserControllers.getSingleUser
+);
+
 // api hobe: api/v1/user/:id
 router.patch(
   "/:id",
+  checkAuth(...Object.values(Role)), // aikhane age authentication-authorization checking er middleware use korte hobe., Then zod schema validate kora right way.
   validateRequest(updateUserZodSchema),
-  checkAuth(...Object.values(Role)),
   UserControllers.updateUser
 ); // ...Object.values(Role) --> mane "USER", "GUIDE", "ADMIN", "SUPER_ADMIN"
 

@@ -3,6 +3,8 @@ import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../../config/env";
 import AppError from "../../errorHelpers/AppError";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { userSearchableFields } from "./user.constant";
 import { IAuthProvider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 
@@ -11,9 +13,9 @@ const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
 
   const isUserExist = await User.findOne({ email });
-  // if (isUserExist) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, "User already exist");
-  // }
+  if (isUserExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User already exist");
+  }
   const authProvider: IAuthProvider = {
     provider: "credentials",
     providerId: email as string,
@@ -88,15 +90,35 @@ const updateUser = async (
   return newUpdatedUser;
 };
 
-const getAllUser = async () => {
-  const users = await User.find({});
-  const totalUsers = await User.countDocuments();
+const getAllUser = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(User.find(), query);
+  const users = await queryBuilder
+    .search(userSearchableFields)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
 
+  const [data, meta] = await Promise.all([
+    users.build(),
+    queryBuilder.getMeta(),
+  ]);
   return {
-    data: users,
-    meta: {
-      total: totalUsers,
-    },
+    meta,
+    data,
   };
 };
-export const UserServices = { createUser, updateUser, getAllUser };
+
+const getSingleUser = async (id: string) => {
+  const user = await User.findById(id);
+
+  return {
+    data: user,
+  };
+};
+export const UserServices = {
+  createUser,
+  updateUser,
+  getAllUser,
+  getSingleUser,
+};
