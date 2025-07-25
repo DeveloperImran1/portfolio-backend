@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
 import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Payment } from "../payment/payment.model";
+import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
+import { SSLServices } from "../sslCommerz/sslCommerz.services";
 import { Tour } from "../tour/tour.model";
 import { User } from "../user/user.model";
 import { BOOKING_STATUS, IBooking } from "./booking.interface";
@@ -85,12 +88,34 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
       .populate("tour", "title costFrom")
       .populate("payment");
 
+    // Akhon payment korar function ke call korbo:
+    const userName = (updatedBooking?.user as any).name;
+    const userAddress = (updatedBooking?.user as any).address;
+    const userEmail = (updatedBooking?.user as any).email;
+    const userPhone = (updatedBooking?.user as any).phone;
+
+    const sslPayload: ISSLCommerz = {
+      name: userName,
+      email: userEmail,
+      address: userAddress,
+      phoneNumber: userPhone,
+      amount: amount,
+      transactionId: transactionId,
+    };
+
+    const sslPayment = await SSLServices.sslPaymentInit(sslPayload);
+
     // --------------> end main code for this api
 
     // sobar last a and return er age ai code gulo likhte hobe..
     await session.commitTransaction(); // transaction --> jodi all operation right vabe hoi. tahole commitTransaction() hosse ba Virtual DB theke amader Main DB te set hobe.
     session.endSession(); // session ke end kore dita hobe.
-    return updatedBooking; // amar api er operatioin sese result return korbo.
+
+    // amar api er operatioin sese result return korbo.
+    return {
+      paymentUrl: sslPayment?.GatewayPageURL,
+      booking: updatedBooking,
+    };
   } catch (error) {
     await session.abortTransaction(); // rollback  --> Jodi upore try block er moddhe kono error hoi. Tahole abortTransaction() er maddhome virtual DB vanish hoia jabe. Main db te kisoi ses hobena.
     session.endSession();
