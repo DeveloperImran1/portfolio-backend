@@ -7,7 +7,12 @@ import { TourServices } from "./tour.services";
 
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await TourServices.createTour(req.body);
+    // req.files property er moddhe all images ase. Seigulo ke map kore images property er moddhe set koresi.
+    const paylaod = {
+      ...req.body,
+      images: (req.files as Express.Multer.File[])?.map((file) => file.path),
+    };
+    const tour = await TourServices.createTour(paylaod);
 
     sendResponse(res, {
       success: true,

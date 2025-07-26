@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 import { envVars } from "../../config/env";
 import AppError from "../errorHelpers/AppError";
 import { handleCastError } from "../helpers/handleCastError";
@@ -11,7 +12,7 @@ import { handleZodError } from "../helpers/handleZodError";
 import { TValidation } from "../interfaces/error.types";
 
 // globalErrorHandler ke middleware er moddhe create koresi and app.ts file a app.use(globalErrorHanlder) koreci. Jar fole every api er last a catch block theke next(error) ke call korle ai globalErrorHandler function ta exicute hobe. So every api a ar extra vabe error handle korte hobena.
-export const globalErrorHandler = (
+export const globalErrorHandler = async (
   error: any,
   req: Request,
   res: Response,
@@ -26,6 +27,21 @@ export const globalErrorHandler = (
    * 4. Zod Validation error --> Uporer ta mongoose theke asa type mismatch handle kore. But jodi zod theke airokom validation error ase. Tahole extra vabe handle korte hobe.
    *
    */
+
+  // Cloudinary theke image delete korar kaj korbo. Jodi req.file ba req.files.length er value true hoi.
+  // single image upload er por data create or update a kono error hole .
+  if (req.file) {
+    await deleteImageFromCloudinary(req.file.path);
+  }
+
+  // multiple image delete korar jonno
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    const imagesUrl = req.files.map((file) => file.path);
+
+    // aikhane Promise.all() method er moddhe loop chalia delete kora hoiase. Aikhane Promise.all() use korlw hoto. but time besi lagto. Karon akta url asbe delete request korbe fully delete hobe, then arekta image er url asbe and delete er request korbe. Thats mean akta ses hower por arekta suro hobe. Ar Promise.all() use korar fole all url er jonno request aksathe hobe. And cloudinary te aksathe multiple image delete hote thakbe. Aktar por akta noi. Tai loading kom hoi.
+    await Promise.all(imagesUrl.map((url) => deleteImageFromCloudinary(url)));
+  }
+
   let statusCode = 500;
   let message = `Something went wrong`;
   let errorSources: TValidation[] = [

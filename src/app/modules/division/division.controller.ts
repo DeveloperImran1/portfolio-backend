@@ -7,13 +7,15 @@ import { DivisionServices } from "./division.services";
 
 const createDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const division = await DivisionServices.createDivision(req.body);
+    // jeheto req.file.path er moddhe upload kora imageer link pawa jabe. Tai oi image ta ke thumbnail property er moddhe set kore dibo.
+    const paylaod = { ...req.body, thumbnail: req.file?.path };
+    const division = await DivisionServices.createDivision(paylaod);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
       message: "Division created successfully",
-      data: division,
+      data: { division },
     });
   }
 );
