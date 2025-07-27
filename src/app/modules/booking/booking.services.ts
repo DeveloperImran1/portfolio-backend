@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
+import { getTransactionId } from "../../utils/getTransactionId";
 import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Payment } from "../payment/payment.model";
 import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
@@ -9,10 +10,6 @@ import { Tour } from "../tour/tour.model";
 import { User } from "../user/user.model";
 import { BOOKING_STATUS, IBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
-
-const getTransactionId = () => {
-  return `tran_${Date.now()}_${Math.ceil(Math.random() * 1000)}`;
-};
 
 // Transaction Rollback: --> bolte bujhai ami amon akjon ke bkash a taka send kortesi, but sei user er bkash number nai. Tahole ami taka send korar pore sei taka jodi onno user er bkash a add na hoi kono karone. Tahole sei taka abar back hoia amar account a chole asbe. Ai process kei bole Transaction Rollback.
 // Same case ta hosse aikhane, ami booking kortesi, jodi booking korar por payment a kono error hoi. tarpor booking ke update kortesi. But payment create korar somoi error khale seikhane theke return hoia chole jabe. Jar fole full api er kiso kaj holo and kiso kaj holona. Last operation ta missing thake gelo. Jeita howa jabena. Ai issue solve kora jai Transaction rollback er maddhome

@@ -1,4 +1,5 @@
 import httpStatus from "http-status-codes";
+import { deleteImageFromCloudinary } from "../../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { tourSearchableFields } from "./tour.constant";
@@ -157,10 +158,55 @@ const updateTour = async (tourId: string, paylaod: Partial<ITour>) => {
   //   paylaod.slug = slug;
   // }
 
+  // CASE 1: jodi ager image gulor sathe new image add korte chai. Tahole nicher moto kore ager images arrayte new image set kore diasi.
+  if (
+    paylaod.images &&
+    paylaod?.images.length > 0 &&
+    isTourExist.images &&
+    isTourExist?.images.length > 0
+  ) {
+    paylaod.images = [...paylaod.images, ...isTourExist.images];
+  }
+
+  // CASE 2: Previous kono images array theke fixed kiso image delete korte pari. Jar jonno interface, mongoose schema, zod schema te “deleteImages” namer akta property nia rakhte pari. User jei jei image delete korbe. Sei sei image gulo select korle oi deleteImages property er moddhe kore backend a nia ase, oi image er url theke public id ke extract kore delete korte pari. And same time a mongodb er ager images gulo theke filter chalia mondodb thekew delete korte pari. Ai deleteImages property kinto amader DB te set hobena. aita sudho delete korar jonno newa hoiase.
+  if (
+    paylaod.deleteImages &&
+    paylaod.deleteImages.length > 0 &&
+    isTourExist.images &&
+    isTourExist.images.length > 0
+  ) {
+    // 1st step: mongodb theke arger images gulor sathe fileter kore noew images array create kora:
+
+    // DB te jei images gulo ase, tader theke deleteImages array er image gulo remove korlam.
+    const restDBImages = isTourExist.images.filter(
+      (imageUrl) => !paylaod.deleteImages?.includes(imageUrl)
+    );
+
+    const updatedPayloadImages = (paylaod?.images || [])
+      .filter((imageUrl) => !paylaod.deleteImages?.includes(imageUrl))
+      .filter((imageUrl) => !restDBImages?.includes(imageUrl));
+
+    paylaod.images = [...restDBImages, ...updatedPayloadImages];
+
+    // 2nd Step: a Cloudinary theke delete korte hobe. Aita aikhane kora thik hobena. Karon DB te age update korar pore delete korte hobe. Otherwise kono error throw hole, ager image gulo invalid hoia jabe.
+  }
+
   const updatedTour = await Tour.findByIdAndUpdate(tourId, paylaod, {
     new: true,
     runValidators: true,
   });
+
+  // delete images from cloudinary
+  if (
+    paylaod.deleteImages &&
+    paylaod.deleteImages.length > 0 &&
+    isTourExist.images &&
+    isTourExist.images.length > 0
+  ) {
+    await Promise.all(
+      paylaod.deleteImages.map((url) => deleteImageFromCloudinary(url))
+    );
+  }
 
   return updatedTour;
 };

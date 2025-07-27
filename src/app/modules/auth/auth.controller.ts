@@ -2,6 +2,7 @@
 
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import passport from "passport";
 import { envVars } from "../../../config/env";
 import AppError from "../../errorHelpers/AppError";
@@ -25,7 +26,7 @@ const credentialsLogin = catchAsync(
         // next(err)
 
         // ✅✅✅✅ aivabe error ke return korte hobe passport er moddhe theke
-        return next(err);
+        // return next(err);
         return next(new AppError(401, err));
       }
 
@@ -107,6 +108,52 @@ const logout = catchAsync(
 
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user;
+
+    await AuthServices.resetPassword(req.body, decodedToken as JwtPayload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Password Reset Successfully",
+      data: null,
+    });
+  }
+);
+
+const setPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const { password } = req.body;
+
+    await AuthServices.setPassword(decodedToken.userId, password);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Password set Successfully",
+      data: null,
+    });
+  }
+);
+
+const forgotPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+
+    await AuthServices.forgotPassword(email);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Email Send Successfully",
+      data: null,
+    });
+  }
+);
+
+const changePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     // auth.controller a asar age checkAuth middleware a giasilo. Then next() er maddhome ai controller a asce. So checkAuth er moddhe token ke docode kore user er info gulo req.user property er moddhe set kore diase. Tai aikhane distructure kore nissi.
     const decodedToken = req.user;
 
@@ -169,5 +216,8 @@ export const AuthControllers = {
   getNewAccessToken,
   logout,
   resetPassword,
+  setPassword,
+  changePassword,
   googleCallbackcontroller,
+  forgotPassword,
 };

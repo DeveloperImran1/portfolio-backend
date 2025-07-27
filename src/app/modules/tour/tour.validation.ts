@@ -107,4 +107,5 @@ export const updateTourZodSchema = z.object({
     .string({ invalid_type_error: "tourType value must be a string" })
     .min(1, { message: "Tour Type field is required" })
     .optional(),
+  deleteImages: z.array(z.string()).optional(),
 });

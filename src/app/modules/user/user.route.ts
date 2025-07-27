@@ -24,6 +24,9 @@ router.get(
   UserControllers.getAllUser
 );
 
+// Jekono user ai router er maddhome tar nijer dota get korte parbe.
+router.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe);
+
 router.get(
   "/:id",
   checkAuth(...Object.values(Role)),

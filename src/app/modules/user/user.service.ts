@@ -110,7 +110,16 @@ const getAllUser = async (query: Record<string, string>) => {
 };
 
 const getSingleUser = async (id: string) => {
-  const user = await User.findById(id);
+  // find korar por .select("-password") --> dara bujhai password field ta bade all field get hobe. Ar minus symboll na dila, sudho password field tai get hoto.
+  const user = await User.findById(id).select("-password");
+
+  return {
+    data: user,
+  };
+};
+
+const getMe = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
 
   return {
     data: user,
@@ -121,4 +130,5 @@ export const UserServices = {
   updateUser,
   getAllUser,
   getSingleUser,
+  getMe,
 };

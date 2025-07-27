@@ -1,4 +1,5 @@
 import httpStatus from "http-status-codes";
+import { deleteImageFromCloudinary } from "../../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { Division } from "./devision.model";
@@ -96,6 +97,12 @@ const updateDivision = async (
       runValidators: true,
     }
   );
+
+  // division update hower pore previous image ke delete korte hobe. Otherwise update korar age korle issue hobe, jodi cloudinary theke delete holo. But kono karone division update holona. Tahole ager image ta invalid hoia thakbe.
+  // Abar division update holo thik ase. But jodi cloudinary theke delete korte kono error hoi. Tar jonno Transaction rollback er moddeh all kaj korte pari. Jar fole last operation cloudinary theke image delete korar age porjonto kono error hole uporer update er kaj rollback hoia ager obosthai jabe.
+  if (payload.thumbnail && isDivisionExist.thumbnail) {
+    await deleteImageFromCloudinary(isDivisionExist.thumbnail);
+  }
 
   return newUpdateDivision;
 };

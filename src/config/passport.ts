@@ -6,7 +6,7 @@ import {
   VerifyCallback,
 } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Role } from "../app/modules/user/user.interface";
+import { IsActive, Role } from "../app/modules/user/user.interface";
 import { User } from "../app/modules/user/user.model";
 import { envVars } from "./env";
 
@@ -24,6 +24,22 @@ passport.use(
 
         if (!isUserExist) {
           return done(null, false, { message: "User not exist" });
+        }
+
+        // user verified, block or inactive hole or deleted hole error throw korbo.
+        if (!isUserExist.isVerified) {
+          return done("User is not verified");
+        }
+
+        if (
+          isUserExist.isActive === IsActive.BLOCK ||
+          isUserExist.isActive === IsActive.INACTIVE
+        ) {
+          return done(`User is ${isUserExist.isActive}`);
+        }
+
+        if (isUserExist.isDeleted === true) {
+          return done("User is Deleted");
         }
 
         // google dia login thakle, return kore dibo akta message. karon se google dia login. But chasse credentials dia login korte. Aikhane some() method check kore kono object er moddhe provider er value google naki. google holei true return korbe.
@@ -58,6 +74,54 @@ passport.use(
 );
 
 // For google signup or signin
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: envVars.GOOGLE_CLIENT_ID,
+//       clientSecret: envVars.GOOGLE_CLIENT_SECRET,
+//       callbackURL: envVars.GOOGLE_CALLBACK_URL,
+//     },
+//     async (
+//       accessToken: string,
+//       refreshToken: string,
+//       profile: Profile,
+//       done: VerifyCallback // profile and done er type gulo passport-google-oauth20 theke import korte hobe.
+//     ) => {
+//       try {
+//         const email = profile?.emails?.[0]?.value;
+//         if (!email) {
+//           return done(null, false, { message: "Email not found" });
+//         }
+
+//         let user = await User.findOne({ email });
+
+//         // ai email er user db te na thakle user create korte hobe db te
+//         if (!user) {
+//           user = await User.create({
+//             email,
+//             name: profile?.displayName,
+//             picture: profile?.photos?.[0]?.value,
+//             role: Role.USER,
+//             isVerified: true,
+//             auths: [
+//               {
+//                 provider: "google",
+//                 providerId: profile.id,
+//               },
+//             ],
+//           });
+
+//           // DB te user create hoia gele, done fulction ke call korbo. 1st perameter a error hole error ke dita hobe, otherwise null dibo. 2nd perameter a user er value ta dibo.
+//           return done(null, user);
+//         }
+//       } catch (error) {
+//         console.log("Google strategy error", error);
+//         return done(error);
+//       }
+//     }
+//   )
+// );
+
 passport.use(
   new GoogleStrategy(
     {
@@ -72,19 +136,38 @@ passport.use(
       done: VerifyCallback // profile and done er type gulo passport-google-oauth20 theke import korte hobe.
     ) => {
       try {
-        const email = profile?.emails?.[0]?.value;
+        const email = profile.emails?.[0].value;
+
         if (!email) {
-          return done(null, false, { message: "Email not found" });
+          return done(null, false, { mesaage: "No email found" });
         }
 
-        let user = await User.findOne({ email });
+        let isUserExist = await User.findOne({ email });
+        if (isUserExist && !isUserExist.isVerified) {
+          // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+          // done("User is not verified")
+          return done(null, false, { message: "User is not verified" });
+        }
 
-        // ai email er user db te na thakle user create korte hobe db te
-        if (!user) {
-          user = await User.create({
+        if (
+          isUserExist &&
+          (isUserExist.isActive === IsActive.BLOCK ||
+            isUserExist.isActive === IsActive.INACTIVE)
+        ) {
+          // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+          done(`User is ${isUserExist.isActive}`);
+        }
+
+        if (isUserExist && isUserExist.isDeleted) {
+          return done(null, false, { message: "User is deleted" });
+          // done("User is deleted")
+        }
+
+        if (!isUserExist) {
+          isUserExist = await User.create({
             email,
-            name: profile?.displayName,
-            picture: profile?.photos?.[0]?.value,
+            name: profile.displayName,
+            picture: profile.photos?.[0].value,
             role: Role.USER,
             isVerified: true,
             auths: [
@@ -94,12 +177,11 @@ passport.use(
               },
             ],
           });
-
-          // DB te user create hoia gele, done fulction ke call korbo. 1st perameter a error hole error ke dita hobe, otherwise null dibo. 2nd perameter a user er value ta dibo.
-          return done(null, user);
         }
+
+        return done(null, isUserExist);
       } catch (error) {
-        console.log("Google strategy error", error);
+        console.log("Google Strategy Error", error);
         return done(error);
       }
     }

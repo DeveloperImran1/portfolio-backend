@@ -32,7 +32,11 @@ export const checkAuth =
         throw new AppError(httpStatus.BAD_REQUEST, "User not found");
       }
 
-      // user block or inactive hole or deleted hole error throw korbo.
+      // user verified, block or inactive hole or deleted hole error throw korbo.
+      if (!isUserExist.isVerified) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User is not verified");
+      }
+
       if (
         isUserExist.isActive === IsActive.BLOCK ||
         isUserExist.isActive === IsActive.INACTIVE

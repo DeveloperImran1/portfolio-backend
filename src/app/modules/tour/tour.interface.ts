@@ -4,7 +4,7 @@ export interface ITour {
   title: string;
   slug: string;
   description?: string;
-  images?: string;
+  images?: string[];
   location?: string;
   costFrom?: string;
   startDate?: Date;
@@ -19,4 +19,5 @@ export interface ITour {
   tourType: Types.ObjectId;
   departureLocation: string;
   arrivalLocation: string;
+  deleteImages: string[];
 }
