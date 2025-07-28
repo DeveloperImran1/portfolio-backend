@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import app from "./app";
 import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 import { envVars } from "./config/env";
+import { connectRedis } from "./config/redis.config";
 
 let server: Server;
 
@@ -23,6 +24,7 @@ const startServer = async () => {
 
 // Jokhon jokhon server run hobe tokhon seedSuperAdmin function tao call hobe. Tobe ensure korte hobe server start hower pore seedSuperAdmin call hobe. Tai async await use koreci. Jotokkhon na porjonto server start hobena. totokkhon porjonto next line a jabena. Ar ai 2ta method ke IIFE function er moddhe rakhe, automatic call koreci.
 (async () => {
+  await connectRedis(); // config> redis.config.ts file a otp send er jonno redis ke configure kore server start hower somoi connect korte hobe.
   await startServer();
   await seedSuperAdmin(); // aikhane seedSuperAdmin function er kaj holo. Jodi DB te super admin na thake. Tahole akta super admin create korbe. Ar jodi already exist thake. Tahole ar superAdmin create korbena.
 })();

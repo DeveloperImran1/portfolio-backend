@@ -1,5 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import stream from "stream";
 import AppError from "../app/errorHelpers/AppError";
 import { envVars } from "./env";
 
@@ -38,5 +40,38 @@ export const deleteImageFromCloudinary = async (url: string) => {
     }
   } catch (error: any) {
     throw new AppError(401, "Cloudinary image deletion failed", error.message);
+  }
+};
+
+// Amra image upload korar somoi front-end theke image nia Multer Storage cloudinary use kore aumatic upload koresi cloudinary te. But user booking er payment korle pdf create kore email kore invoice er pdf send kortesi email a. Ar sei pdf cloudinary te akhon manualy upload kore then DB te set korte hobe. Akhon ai multer storage er kajta manualy korbo niche
+export const uploadBufferToCloudinary = async (
+  buffer: Buffer,
+  filename: string
+): Promise<UploadApiResponse | undefined> => {
+  try {
+    return new Promise((resolve, reject) => {
+      const public_id = `pdf/${filename}-${Date.now()}`;
+      const bufferStream = new stream.PassThrough();
+      bufferStream.end(buffer);
+
+      cloudinary.uploader
+        .upload_stream(
+          {
+            resource_type: "auto",
+            public_id: public_id,
+            folder: "pdf",
+          },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          }
+        )
+        .end(buffer);
+    });
+  } catch (error: any) {
+    console.log(error);
+    throw new AppError(401, `Error uploading file ${error.message}`);
   }
 };

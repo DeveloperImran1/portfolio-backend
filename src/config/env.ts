@@ -9,6 +9,7 @@ dotenv.config();
 // };
 
 // For typescript using interface and type checking
+// aikhane sobgulor variable er type ee string hobe. Because .env file theke asa sobai string thake. Number oo string hoi. So code er kothao jodi number need pore, tahole Number() dia convert kore use korte hobe.
 interface EnvConfig {
   PORT: string;
   DB_URL: string;
@@ -52,6 +53,12 @@ interface EnvConfig {
     SMTP_USER: string;
     SMTP_FROM: string;
   };
+
+  // Redis
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  REDIS_USERNAME: string;
+  REDIS_PASSWORD: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -95,6 +102,12 @@ const loadEnvVariables = (): EnvConfig => {
     "SMTP_PORT",
     "SMTP_USER",
     "SMTP_FROM",
+
+    // Redis
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "REDIS_USERNAME",
+    "REDIS_PASSWORD",
   ];
 
   // array ke map kore key gulo nissa. Jodi requiredEnvVariables array er kono key .env file er moddhe na thake, tahole error through korbe.
@@ -151,6 +164,12 @@ const loadEnvVariables = (): EnvConfig => {
       SMTP_USER: process.env.SMTP_USER as string,
       SMTP_FROM: process.env.SMTP_FROM as string,
     },
+
+    // Redis
+    REDIS_HOST: process.env.REDIS_HOST as string,
+    REDIS_PORT: process.env.REDIS_PORT as string,
+    REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
   };
 };
 
