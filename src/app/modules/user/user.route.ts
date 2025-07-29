@@ -27,9 +27,10 @@ router.get(
 // Jekono user ai router er maddhome tar nijer dota get korte parbe.
 router.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe);
 
+// akjon user ke onno user get korte parbena. sudho admin and super-admin get korte parbe.
 router.get(
   "/:id",
-  checkAuth(...Object.values(Role)),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   UserControllers.getSingleUser
 );
 

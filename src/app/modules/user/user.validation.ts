@@ -34,17 +34,18 @@ export const createUserZodSchema = z.object({
 });
 
 export const updateUserZodSchema = z.object({
-  password: z
-    .string({ invalid_type_error: "Password must be a string" })
-    .min(8, { message: "Password must have 8 charecter long" })
-    .regex(/(?=.*[A-Z])/, {
-      message: "Password include atleast 1 uppercase",
-    })
-    .regex(/(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, {
-      message: "Password include atleast special charrecter",
-    })
-    .regex(/(?=.*\d)/, { message: "Password include atleast 1 number" })
-    .optional(),
+  // ai kajta aikhane korbona. Karon password change korar jonno extra api ase. So schema thekew remove kortesi.
+  // password: z
+  //   .string({ invalid_type_error: "Password must be a string" })
+  //   .min(8, { message: "Password must have 8 charecter long" })
+  //   .regex(/(?=.*[A-Z])/, {
+  //     message: "Password include atleast 1 uppercase",
+  //   })
+  //   .regex(/(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, {
+  //     message: "Password include atleast special charrecter",
+  //   })
+  //   .regex(/(?=.*\d)/, { message: "Password include atleast 1 number" })
+  //   .optional(),
   phone: z
     .string({ invalid_type_error: "Phone number must be string" })
     .regex(/^(?:\+88|88)?01[3-9]\d{8}$/, {

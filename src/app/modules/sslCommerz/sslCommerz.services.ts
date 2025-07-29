@@ -4,6 +4,7 @@ import axios from "axios";
 import httpStatus from "http-status-codes";
 import { envVars } from "../../../config/env";
 import AppError from "../../errorHelpers/AppError";
+import { Payment } from "../payment/payment.model";
 import { ISSLCommerz } from "./sslCommerz.interface";
 
 const sslPaymentInit = async (payload: ISSLCommerz) => {
@@ -17,7 +18,7 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
       success_url: `${envVars.SSL.SSL_SUCCESS_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
       fail_url: `${envVars.SSL.SSL_FAIL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail`,
       cancel_url: `${envVars.SSL.SSL_CANCEL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel`,
-      // ipn_url: "http://localhost:3030/ipn",
+      ipn_url: envVars.SSL.SSL_IPN_URL,
       shipping_method: "N/A",
       product_name: "Tour",
       product_category: "Service",
@@ -56,4 +57,26 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
   }
 };
 
-export const SSLServices = { sslPaymentInit };
+const validatePayment = async (payload: any) => {
+  try {
+    const response = await axios({
+      method: "GET",
+      url: `${envVars.SSL.SSL_VALIDATION_API}?val_id=${payload.val_id}&store_id=${envVars.SSL.SSL_STORE_ID}&store_password=${envVars.SSL.SSL_STORE_PASS}`,
+    });
+
+    console.log("SSL commerz validate api response ", response.data); // aita localhost a thaka obosthai asbena, so deploy korar por vercel er terminal theke dekhte hobe.
+
+    await Payment.updateOne(
+      { transactionId: payload.tran_id },
+      { paymentGatewayData: response.data },
+      { runValidators: true }
+    );
+  } catch (error: any) {
+    console.log(error);
+    throw new AppError(
+      httpStatus.BAD_GATEWAY,
+      `Payment validation error ${error.message}`
+    );
+  }
+};
+export const SSLServices = { sslPaymentInit, validatePayment };

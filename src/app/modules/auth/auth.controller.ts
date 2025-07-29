@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // Ai auth module er moddhe authenticaiton: login, logout, password reset etc kaj korbo. Aitar jonno extra vabe interface, model or schema create korte hobena. Ai schema, interface user model, interface dia hoia jabe.
 
 import { NextFunction, Request, Response } from "express";
@@ -167,7 +169,7 @@ const changePassword = catchAsync(
       );
     }
 
-    await AuthServices.resetPassword(oldPassword, newPassword, decodedToken);
+    await AuthServices.resetPassword(req.body, decodedToken as JwtPayload);
 
     sendResponse(res, {
       success: true,

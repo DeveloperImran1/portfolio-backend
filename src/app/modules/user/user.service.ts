@@ -49,19 +49,35 @@ const updateUser = async (
    * Only superAdmin can a user or admin to superAdmin
    */
 
+  // Admin and superAdmin je karo info update korte pare. But jodi role user or guide tahole se sudho nijer profile update korte parbe. Onno karo profile change korte parbena.
+  if (decodedToken.role == Role.USER || decodedToken.role == Role.GUIDE) {
+    if (userId !== decodedToken.userId) {
+      throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+    }
+  }
+
   // user exist naki, check korbo
   const isUserExist = await User.findById(userId);
 
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User not exist");
   }
+
+  // Admin super admin bade je karo profile update korte parbe.
+  if (
+    decodedToken.role === Role.ADMIN &&
+    isUserExist.role === Role.SUPER_ADMIN
+  ) {
+    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+  }
+
   // payload er moddhe role property thakle vitore dhukbe.
   if (payload.role) {
     // decodedToken or request kora user er role jodi user ba guide hoi. Tahole role ke update korte parbena.
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
-    // decodedToken or request kora user er role jodi admin hoi. Tahole superAdmin korte dita parbena. Tai check kortesi payload a asa role er value ki superAdmin naki.
+    // decodedToken or request kora user er role jodi admin hoi. Tahole superAdmin er kono kiso update korte parbena sei admin. Tai check kortesi payload a asa role er value ki superAdmin naki.
     if (decodedToken.role === Role.ADMIN && payload.role === Role.SUPER_ADMIN) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
@@ -75,12 +91,13 @@ const updateUser = async (
   }
 
   // jodi password ke update korte chai, tahole payloead theke password ta nia encrypt kore abar paylaod a set kore kore diasi.
-  if (payload.password) {
-    payload.password = await bcrypt.hash(
-      payload.password,
-      Number(envVars.BCRYPT_SALT_ROUND)
-    );
-  }
+  // ai kajta aikhane korbona. Karon password change korar jonno extra api ase. So schema thekew remove kortesi.
+  // if (payload.password) {
+  //   payload.password = await bcrypt.hash(
+  //     payload.password,
+  //     Number(envVars.BCRYPT_SALT_ROUND)
+  //   );
+  // }
 
   const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true, // update hoia updated info gulo newUpdatedUser er moddhe asbe.

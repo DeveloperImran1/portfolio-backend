@@ -24,7 +24,12 @@ app.use(passport.session());
 app.use(cookieParser());
 app.use(express.json()); // json data ke parse korar somoi use hoi.
 app.use(express.urlencoded({ extended: true })); // string data ke parse korar somoi use hoi. multer er jonno image file ke form data te er maddhome send kortesi. Ar body er data gulo text akare send kortesi tai ai middleware use korte hobe.
-app.use(cors());
+app.use(
+  cors({
+    origin: envVars.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 //API Routes call
 app.use("/api/v1", router);

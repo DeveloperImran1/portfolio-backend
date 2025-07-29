@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response, Router } from "express";
 import passport from "passport";
 import { envVars } from "../../../config/env";

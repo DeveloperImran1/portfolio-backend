@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import bcryptjs from "bcryptjs";
@@ -124,7 +125,7 @@ const changePassword = async (
 ) => {
   const user = await User.findById(decodedToken.userId);
 
-  const isOldPasswordMatch = await bcrypt.compare(
+  const isOldPasswordMatch = await bcryptjs.compare(
     oldPassword,
     user?.password as string
   );
@@ -134,7 +135,7 @@ const changePassword = async (
   }
 
   // aikhane user null hobena, aita bujhar jonno not null assertion symbol (!) use koreci. ar hash kora password ke user.password er moddhe bose, save() kore diasi.
-  user!.password = await bcrypt.hash(
+  user!.password = await bcryptjs.hash(
     newPassword,
     Number(envVars.BCRYPT_SALT_ROUND)
   );

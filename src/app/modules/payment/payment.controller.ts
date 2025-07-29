@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { envVars } from "../../../config/env";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
+import { SSLServices } from "../sslCommerz/sslCommerz.services";
 import { PaymentServices } from "./payment.services";
 
 // Situation 1:
@@ -86,10 +88,24 @@ const getInvoiceDownloadUrl = catchAsync(
   }
 );
 
+const validatePayment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    await SSLServices.validatePayment(req.body);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Payment validation successfully",
+      data: null,
+    });
+  }
+);
+
 export const PaymentController = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
   getInvoiceDownloadUrl,
+  validatePayment,
 };
