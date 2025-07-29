@@ -14,22 +14,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
+const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
+const env_1 = require("./config/env");
+const redis_config_1 = require("./config/redis.config");
 let server;
-const name = "fsds";
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const uri = "mongodb+srv://library:library@cluster0.hqv81rk.mongodb.net/tour-management-backend?retryWrites=true&w=majority&appName=Cluster0";
+        const uri = env_1.envVars.DB_URL;
         yield mongoose_1.default.connect(uri);
         console.log("MongoDB is connected!!");
-        server = app_1.default.listen(5000, () => {
-            console.log("Server is listening on port 5000");
+        server = app_1.default.listen(env_1.envVars.PORT, () => {
+            console.log(`Server is listening on port ${env_1.envVars.PORT}`);
         });
     }
     catch (error) {
         console.log("Server error is ", error);
     }
 });
-startServer();
+// Jokhon jokhon server run hobe tokhon seedSuperAdmin function tao call hobe. Tobe ensure korte hobe server start hower pore seedSuperAdmin call hobe. Tai async await use koreci. Jotokkhon na porjonto server start hobena. totokkhon porjonto next line a jabena. Ar ai 2ta method ke IIFE function er moddhe rakhe, automatic call koreci.
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, redis_config_1.connectRedis)(); // config> redis.config.ts file a otp send er jonno redis ke configure kore server start hower somoi connect korte hobe.
+    yield startServer();
+    yield (0, seedSuperAdmin_1.seedSuperAdmin)(); // aikhane seedSuperAdmin function er kaj holo. Jodi DB te super admin na thake. Tahole akta super admin create korbe. Ar jodi already exist thake. Tahole ar superAdmin create korbena.
+}))();
 // Unhandeld rejection error
 process.on("unhandledRejection", (err) => {
     console.log("Unhandled Rejection detected. Server is shutting down .. error is ", err);
@@ -79,7 +86,7 @@ process.on("SIGINT", () => {
     process.exit(1);
 });
 /**
- * Total 3 type of error in backend
+ * Total 3 type of error in backend server related
  * 1. Unhandeld rejection error --> asynchronous, promise related kono error hoiase, but seitake jodi try catch er maddhome error handle na kori. Tahole take handle korte hobe.
  
  * 2. Uncaught exception error --> Amader code er moddhe syntax or common error gulo hoi. Like variable name declare korini, but oi variable use kortesi. Sei error ke try catch er maddhome handle na korle, last a uncaught exception er maddhome handle korte pari.

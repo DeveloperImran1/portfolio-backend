@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TourTypeRoutes = void 0;
+const express_1 = require("express");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const validateRequest_1 = require("../../middlewares/validateRequest");
+const user_interface_1 = require("../user/user.interface");
+const tourType_controller_1 = require("./tourType.controller");
+const tourType_validation_1 = require("./tourType.validation");
+const router = (0, express_1.Router)();
+router.post("/create-tour-type", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(tourType_validation_1.createTourTypeZodSchema), tourType_controller_1.TourTypeController.createTourType);
+router.get("/tour-types", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), tourType_controller_1.TourTypeController.getAllTourType);
+router.get("/tour-types/:id", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), tourType_controller_1.TourTypeController.getSingleTourType);
+router.patch("/tour-types/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(tourType_validation_1.updateTourTypeZodSchema), tourType_controller_1.TourTypeController.updateTourType);
+router.delete("/tour-types/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), tourType_controller_1.TourTypeController.deleteTourType);
+exports.TourTypeRoutes = router;

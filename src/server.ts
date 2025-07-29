@@ -2,7 +2,9 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 import { envVars } from "./config/env";
+import { connectRedis } from "./config/redis.config";
 
 let server: Server;
 
@@ -12,7 +14,7 @@ const startServer = async () => {
     await mongoose.connect(uri);
     console.log("MongoDB is connected!!");
 
-    server = app.listen(5000, () => {
+    server = app.listen(envVars.PORT, () => {
       console.log(`Server is listening on port ${envVars.PORT}`);
     });
   } catch (error) {
@@ -20,7 +22,12 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Jokhon jokhon server run hobe tokhon seedSuperAdmin function tao call hobe. Tobe ensure korte hobe server start hower pore seedSuperAdmin call hobe. Tai async await use koreci. Jotokkhon na porjonto server start hobena. totokkhon porjonto next line a jabena. Ar ai 2ta method ke IIFE function er moddhe rakhe, automatic call koreci.
+(async () => {
+  await connectRedis(); // config> redis.config.ts file a otp send er jonno redis ke configure kore server start hower somoi connect korte hobe.
+  await startServer();
+  await seedSuperAdmin(); // aikhane seedSuperAdmin function er kaj holo. Jodi DB te super admin na thake. Tahole akta super admin create korbe. Ar jodi already exist thake. Tahole ar superAdmin create korbena.
+})();
 
 // Unhandeld rejection error
 process.on("unhandledRejection", (err) => {
@@ -90,7 +97,7 @@ process.on("SIGINT", () => {
 });
 
 /**
- * Total 3 type of error in backend 
+ * Total 3 type of error in backend server related
  * 1. Unhandeld rejection error --> asynchronous, promise related kono error hoiase, but seitake jodi try catch er maddhome error handle na kori. Tahole take handle korte hobe.
  
  * 2. Uncaught exception error --> Amader code er moddhe syntax or common error gulo hoi. Like variable name declare korini, but oi variable use kortesi. Sei error ke try catch er maddhome handle na korle, last a uncaught exception er maddhome handle korte pari.
