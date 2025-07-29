@@ -22,6 +22,7 @@ app.use((0, express_session_1.default)({
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 app.use((0, cookie_parser_1.default)());
+app.set("trust proxy", 1);
 app.use(express_1.default.json()); // json data ke parse korar somoi use hoi.
 app.use(express_1.default.urlencoded({ extended: true })); // string data ke parse korar somoi use hoi. multer er jonno image file ke form data te er maddhome send kortesi. Ar body er data gulo text akare send kortesi tai ai middleware use korte hobe.
 app.use((0, cors_1.default)({
