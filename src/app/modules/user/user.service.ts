@@ -43,14 +43,13 @@ const updateUser = async (
 ) => {
   /**
    * email --> cannot update
-   * user can update : phone, password, name, address etc.
+   * user can update :  password, name etc.
    * password --> for update need rehashing
-   * Only admin and superAdmin can update isDeleted, role
-   * Only superAdmin can a user or admin to superAdmin
+   * Only admin can update isBlock, role
    */
 
-  // Admin and superAdmin je karo info update korte pare. But jodi role user or guide tahole se sudho nijer profile update korte parbe. Onno karo profile change korte parbena.
-  if (decodedToken.role == Role.USER || decodedToken.role == Role.GUIDE) {
+  // Admin and admin je karo info update korte pare. But jodi role user hoi tahole se sudho nijer profile update korte parbe. Onno karo profile change korte parbena.
+  if (decodedToken.role == Role.USER ) {
     if (userId !== decodedToken.userId) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
@@ -63,41 +62,26 @@ const updateUser = async (
     throw new AppError(httpStatus.NOT_FOUND, "User not exist");
   }
 
-  // Admin super admin bade je karo profile update korte parbe.
-  if (
-    decodedToken.role === Role.ADMIN &&
-    isUserExist.role === Role.SUPER_ADMIN
-  ) {
-    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
-  }
 
   // payload er moddhe role property thakle vitore dhukbe.
   if (payload.role) {
-    // decodedToken or request kora user er role jodi user ba guide hoi. Tahole role ke update korte parbena.
-    if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
+    // decodedToken or request kora user er role jodi user hoi. Tahole role ke update korte parbena.
+    if (decodedToken.role === Role.USER ) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
     // decodedToken or request kora user er role jodi admin hoi. Tahole superAdmin er kono kiso update korte parbena sei admin. Tai check kortesi payload a asa role er value ki superAdmin naki.
-    if (decodedToken.role === Role.ADMIN && payload.role === Role.SUPER_ADMIN) {
+    if (decodedToken.role === Role.USER && payload.role === Role.ADMIN) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
   }
 
   // isActive, isDeleted, isVerified property gulo sudho admin or super admin update korte parbe.
-  if (payload.isActive || payload.isDeleted || payload.isVerified) {
-    if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
+  if (payload.isBlock) {
+    if (decodedToken.role === Role.USER) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
   }
 
-  // jodi password ke update korte chai, tahole payloead theke password ta nia encrypt kore abar paylaod a set kore kore diasi.
-  // ai kajta aikhane korbona. Karon password change korar jonno extra api ase. So schema thekew remove kortesi.
-  // if (payload.password) {
-  //   payload.password = await bcrypt.hash(
-  //     payload.password,
-  //     Number(envVars.BCRYPT_SALT_ROUND)
-  //   );
-  // }
 
   const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true, // update hoia updated info gulo newUpdatedUser er moddhe asbe.
@@ -144,8 +128,8 @@ const getMe = async (userId: string) => {
 };
 export const UserServices = {
   createUser,
-  updateUser,
   getAllUser,
+  updateUser,
   getSingleUser,
   getMe,
 };

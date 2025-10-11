@@ -16,10 +16,10 @@ import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // AuthServices.credentialsLogin function er kajta nicher passport.ts file er maddhome kora hoiase. Tai ai line comment koresi.
-    // const loginInfo = await AuthServices.credentialsLogin(req.body);
+
 
     //credentialsLogin er maddhe jaja kortam, ta akhon passport.authentecation er moddhe korbo.
+
     passport.authenticate("local", async (err: any, user: any, info: any) => {
       if (err) {
         // ❌❌❌❌ aivaime error throw kora jabena.
@@ -32,6 +32,7 @@ const credentialsLogin = catchAsync(
         return next(new AppError(401, err));
       }
 
+          console.log("body", req.body)
       if (!user) {
         return next(new AppError(401, info.message));
       }
@@ -162,6 +163,8 @@ const changePassword = catchAsync(
     const newPassword = req?.body?.newPassword;
     const oldPassword = req?.body?.oldPassword;
 
+
+
     if (!newPassword || !oldPassword) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -169,7 +172,7 @@ const changePassword = catchAsync(
       );
     }
 
-    await AuthServices.resetPassword(req.body, decodedToken as JwtPayload);
+    await AuthServices.changePassword(oldPassword, newPassword, decodedToken as JwtPayload);
 
     sendResponse(res, {
       success: true,

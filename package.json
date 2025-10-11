@@ -1,5 +1,5 @@
 {
-  "name": "backend-ph-tour-management",
+  "name": "portfolio-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -22,16 +22,17 @@
     "@types/express": "^5.0.3",
     "@types/express-session": "^1.18.2",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/nodemailer": "^6.4.17",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-local": "^1.0.38",
+    "@types/pdfkit": "^0.17.2",
     "eslint": "^9.30.1",
+    "prettier": "^3.6.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.35.1",
-    "@types/multer": "^2.0.0",
-    "@types/nodemailer": "^6.4.17",
-    "@types/pdfkit": "^0.17.2"
+    "typescript-eslint": "^8.35.1"
   },
   "dependencies": {
     "axios": "^1.11.0",

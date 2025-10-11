@@ -35,6 +35,7 @@ router.post(
   AuthControllers.resetPassword
 );
 
+// Normaly login kora kono user profile update korar jonno, ager password dia  new password set korte parbe.
 router.post(
   "/change-password",
   checkAuth(...Object.values(Role)),

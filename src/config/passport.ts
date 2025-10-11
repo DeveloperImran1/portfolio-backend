@@ -7,7 +7,7 @@ import {
   VerifyCallback,
 } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
-import { IsActive, Role } from "../app/modules/user/user.interface";
+import { Role } from "../app/modules/user/user.interface";
 import { User } from "../app/modules/user/user.model";
 import { envVars } from "./env";
 
@@ -27,20 +27,9 @@ passport.use(
           return done(null, false, { message: "User not exist" });
         }
 
-        // user verified, block or inactive hole or deleted hole error throw korbo.
-        if (!isUserExist.isVerified) {
-          return done("User is not verified");
-        }
 
-        if (
-          isUserExist.isActive === IsActive.BLOCK ||
-          isUserExist.isActive === IsActive.INACTIVE
-        ) {
-          return done(`User is ${isUserExist.isActive}`);
-        }
-
-        if (isUserExist.isDeleted === true) {
-          return done("User is Deleted");
+        if (isUserExist.isBlock === true) {
+          return done("User is Blocked");
         }
 
         // google dia login thakle, return kore dibo akta message. karon se google dia login. But chasse credentials dia login korte. Aikhane some() method check kore kono object er moddhe provider er value google naki. google holei true return korbe.
@@ -123,6 +112,8 @@ passport.use(
 //   )
 // );
 
+
+// credential and google both login with passport
 passport.use(
   new GoogleStrategy(
     {
@@ -144,24 +135,10 @@ passport.use(
         }
 
         let isUserExist = await User.findOne({ email });
-        if (isUserExist && !isUserExist.isVerified) {
-          // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
-          // done("User is not verified")
-          return done(null, false, { message: "User is not verified" });
-        }
-
-        if (
-          isUserExist &&
-          (isUserExist.isActive === IsActive.BLOCK ||
-            isUserExist.isActive === IsActive.INACTIVE)
-        ) {
-          // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
-          done(`User is ${isUserExist.isActive}`);
-        }
-
-        if (isUserExist && isUserExist.isDeleted) {
-          return done(null, false, { message: "User is deleted" });
-          // done("User is deleted")
+        if (isUserExist && isUserExist.isBlock) {
+          // throw new AppError(httpStatus.BAD_REQUEST, "User is blocked")
+          // done("User is blocked")
+          return done(null, false, { message: "User is blocked" });
         }
 
         if (!isUserExist) {

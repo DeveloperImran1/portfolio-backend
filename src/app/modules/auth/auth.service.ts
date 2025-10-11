@@ -11,37 +11,6 @@ import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
 import { IAuthProvider, IsActive } from "../user/user.interface";
 import { User } from "../user/user.model";
 
-// credentialsLogin er moddher all kaj passport.ts file er moddhe kora hoiase. Because google login kora user der ke condition dia lagin er kaj korasse.
-// const credentialsLogin = async (payload: Partial<IUser>) => {
-//   const { email, password } = payload;
-
-//   const isUserExist = await User.findOne({ email });
-//   if (!isUserExist) {
-//     throw new AppError(httpStatus.BAD_REQUEST, "User not found");
-//   }
-
-//   const isPasswordMatched = await bcrypt.compare(
-//     password as string,
-//     isUserExist.password as string
-//   );
-
-//   if (!isPasswordMatched) {
-//     throw new AppError(httpStatus.BAD_GATEWAY, "Invalid Password");
-//   }
-
-//   //  token create
-//   const userToken = createUserTokens(isUserExist);
-
-//   // isUserExist er moddhe user er all data ase. But password front-end a send na korai better. Tai isUserExist theke password property ke delete korbo.
-//   const { password: pass, ...rest } = isUserExist.toObject();
-
-//   // user login korar pore ai object ta front-end a jabe. ai token gulo nia cookie te set kora rakhte  hobe.
-//   return {
-//     accessToken: userToken.accessToken,
-//     refreshToken: userToken.refreshToken,
-//     user: rest,
-//   };
-// };
 
 // new token generate using refresh token
 const getNewAccessToken = async (refreshToken: string) => {
@@ -151,23 +120,9 @@ const forgotPassword = async (email: string) => {
     throw new AppError(httpStatus.BAD_REQUEST, "User not found");
   }
 
-  // user verified, block or inactive hole or deleted hole error throw korbo.
-  if (!isUserExist.isVerified) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User is not verified");
-  }
-
-  if (
-    isUserExist.isActive === IsActive.BLOCK ||
-    isUserExist.isActive === IsActive.INACTIVE
-  ) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      `User is ${isUserExist.isActive}`
-    );
-  }
-
-  if (isUserExist.isDeleted === true) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User is Deleted");
+ 
+  if (isUserExist.isBlock === true) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is Blocked");
   }
 
   const JwtPayload = {
