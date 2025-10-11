@@ -14,4 +14,6 @@ router.post(
   ReactionController.createReaction,
 );
 
+router.get('/:blogId', ReactionController.allReactionWithBlogId);
+
 export const ReactionRoute = router;
