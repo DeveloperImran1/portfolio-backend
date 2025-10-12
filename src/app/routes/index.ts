@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { BlogRoutes } from '../modules/blog/blog.route';
 import { BookingRoutes } from '../modules/booking/booking.route';
+import { CommentRoute } from '../modules/comment/comment.route';
 import { DivisionRoutes } from '../modules/division/division.route';
 import { OtpRoutes } from '../modules/otp/otp.route';
 import { PaymentRoutes } from '../modules/payment/payment.route';
@@ -57,6 +58,10 @@ const moduleRoutes = [
   {
     path: '/reaction',
     route: ReactionRoute,
+  },
+  {
+    path: '/comment',
+    route: CommentRoute,
   },
 ];
 
