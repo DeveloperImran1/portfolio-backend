@@ -1,10 +1,10 @@
-import httpStatus from "http-status-codes";
-import { JwtPayload } from "jsonwebtoken";
-import { envVars } from "../../config/env";
-import AppError from "../errorHelpers/AppError";
-import { IsActive, IUser } from "../modules/user/user.interface";
-import { User } from "../modules/user/user.model";
-import { generateToken, verifyToken } from "./jwt";
+import httpStatus from 'http-status-codes';
+import { JwtPayload } from 'jsonwebtoken';
+import { envVars } from '../../config/env';
+import AppError from '../errorHelpers/AppError';
+import { IUser } from '../modules/user/user.interface';
+import { User } from '../modules/user/user.model';
+import { generateToken, verifyToken } from './jwt';
 
 export const createUserTokens = (user: Partial<IUser>) => {
   // Token create
@@ -17,48 +17,37 @@ export const createUserTokens = (user: Partial<IUser>) => {
   const accessToken = generateToken(
     jwtPayload,
     envVars.JWT_ACCESS_SECRET,
-    envVars.JWT_ACCESS_EXPIRES
+    envVars.JWT_ACCESS_EXPIRES,
   );
 
   // Refresh token same way te create korbo, sudho secret and expires time ta change hobe.
   const refreshToken = generateToken(
     jwtPayload,
     envVars.JWT_REFRESH_SECRET,
-    envVars.JWT_REFRESH_EXPIRES
+    envVars.JWT_REFRESH_EXPIRES,
   );
 
   return { accessToken, refreshToken };
 };
 
 export const createNewAccessTokenWithRefreshToken = async (
-  refreshToken: string
+  refreshToken: string,
 ) => {
   // jei refreshToken dia new accessToken generate korbo, sei refreshToken valid kina ta verify korbo and decode kore user er data gulo nia asbo. Sei user er info gulo verifiedRefreshToken er moddhe store thakbe.
   const verifiedRefreshToken = verifyToken(
     refreshToken,
-    envVars.JWT_REFRESH_SECRET
+    envVars.JWT_REFRESH_SECRET,
   ) as JwtPayload;
 
   // DB te oi email er user ase kina, check kortesi.
   const isUserExist = await User.findOne({ email: verifiedRefreshToken.email });
 
   if (!isUserExist) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User not found");
+    throw new AppError(httpStatus.BAD_REQUEST, 'User not found');
   }
 
-  // user block or inactive hole or deleted hole error throw korbo.
-  if (
-    isUserExist.isActive === IsActive.BLOCK ||
-    isUserExist.isActive === IsActive.INACTIVE
-  ) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      `User is ${isUserExist.isActive}`
-    );
-  }
-
-  if (isUserExist.isDeleted === true) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User is Deleted");
+  if (isUserExist.isBlock === true) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is blocked');
   }
 
   // accessToke token create kore return kore dissi. Akhon controller er moddhe ai new accessToken ta cookie te reset kore diba and front-end a send korbe.
@@ -71,7 +60,7 @@ export const createNewAccessTokenWithRefreshToken = async (
   const accessToken = generateToken(
     jwtPayload,
     envVars.JWT_ACCESS_SECRET,
-    envVars.JWT_ACCESS_EXPIRES
+    envVars.JWT_ACCESS_EXPIRES,
   );
 
   return accessToken;

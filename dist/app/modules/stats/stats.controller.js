@@ -22,40 +22,10 @@ const getUserStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "User stats retrived successfully",
-        data: tour,
-    });
-}));
-const getTourStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const tour = yield stats_services_1.StatsServices.getTourStats();
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_codes_1.default.OK,
-        message: "Tour stats retrived successfully",
-        data: tour,
-    });
-}));
-const getBookingStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const tour = yield stats_services_1.StatsServices.getBookingStats();
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_codes_1.default.OK,
-        message: "Tour retrived successfully",
-        data: tour,
-    });
-}));
-const getPaymentStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const tour = yield stats_services_1.StatsServices.getPaymentStats();
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_codes_1.default.OK,
-        message: "Tour retrived successfully",
+        message: 'User stats retrived successfully',
         data: tour,
     });
 }));
 exports.StatsController = {
-    getBookingStats,
-    getPaymentStats,
     getUserStats,
-    getTourStats,
 };

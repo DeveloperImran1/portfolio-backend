@@ -1,19 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status-codes';
+import { JwtPayload } from 'jsonwebtoken';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { ReactionServices } from './reaction.services';
 
 const createReaction = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const decodedToken = req.user;
+    const decodedToken = req.user as JwtPayload;
     const paylaod = { ...req.body, userId: decodedToken?.userId };
 
-    const reaction = await ReactionServices.createReaction(
-      paylaod,
-      decodedToken,
-    );
+    const reaction = await ReactionServices.createReaction(paylaod);
 
     sendResponse(res, {
       success: true,

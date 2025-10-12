@@ -23,25 +23,25 @@ const seedSuperAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
             email: env_1.envVars.SUPER_ADMIN_EMAIL,
         });
         if (isSuperAdminExist) {
-            console.log("Already super admin exist");
+            console.log('Already super admin exist');
             return;
         }
-        console.log("Try to Super admin creating ...");
+        console.log('Try to Super admin creating ...');
         const hashedPassword = yield bcryptjs_1.default.hash(env_1.envVars.SUPER_ADMIN_PASSWORD, Number(env_1.envVars.BCRYPT_SALT_ROUND));
         const authProvider = {
-            provider: "credentials",
+            provider: 'credentials',
             providerId: env_1.envVars.SUPER_ADMIN_EMAIL,
         };
         const payload = {
-            name: "Super admin",
+            name: 'Super admin',
             email: env_1.envVars.SUPER_ADMIN_EMAIL,
-            role: user_interface_1.Role.SUPER_ADMIN,
+            role: user_interface_1.Role.ADMIN,
             password: hashedPassword,
             isVarified: true,
             auths: [authProvider],
         };
         const createSuperAdmin = yield user_model_1.User.create(payload);
-        console.log("Super admin create successfull!");
+        console.log('Super admin create successfull!');
         console.log(createSuperAdmin);
     }
     catch (error) {

@@ -31,16 +31,8 @@ passport_1.default.use(new passport_local_1.Strategy({
         if (!isUserExist) {
             return done(null, false, { message: "User not exist" });
         }
-        // user verified, block or inactive hole or deleted hole error throw korbo.
-        if (!isUserExist.isVerified) {
-            return done("User is not verified");
-        }
-        if (isUserExist.isActive === user_interface_1.IsActive.BLOCK ||
-            isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
-            return done(`User is ${isUserExist.isActive}`);
-        }
-        if (isUserExist.isDeleted === true) {
-            return done("User is Deleted");
+        if (isUserExist.isBlock === true) {
+            return done("User is Blocked");
         }
         // google dia login thakle, return kore dibo akta message. karon se google dia login. But chasse credentials dia login korte. Aikhane some() method check kore kono object er moddhe provider er value google naki. google holei true return korbe.
         const isGoogleAuthenticated = isUserExist.auths.some((providerObj) => providerObj.provider == "google");
@@ -106,6 +98,7 @@ passport_1.default.use(new passport_local_1.Strategy({
 //     }
 //   )
 // );
+// credential and google both login with passport
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: env_1.envVars.GOOGLE_CLIENT_ID,
     clientSecret: env_1.envVars.GOOGLE_CLIENT_SECRET,
@@ -119,20 +112,10 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
             return done(null, false, { mesaage: "No email found" });
         }
         let isUserExist = yield user_model_1.User.findOne({ email });
-        if (isUserExist && !isUserExist.isVerified) {
-            // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
-            // done("User is not verified")
-            return done(null, false, { message: "User is not verified" });
-        }
-        if (isUserExist &&
-            (isUserExist.isActive === user_interface_1.IsActive.BLOCK ||
-                isUserExist.isActive === user_interface_1.IsActive.INACTIVE)) {
-            // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
-            done(`User is ${isUserExist.isActive}`);
-        }
-        if (isUserExist && isUserExist.isDeleted) {
-            return done(null, false, { message: "User is deleted" });
-            // done("User is deleted")
+        if (isUserExist && isUserExist.isBlock) {
+            // throw new AppError(httpStatus.BAD_REQUEST, "User is blocked")
+            // done("User is blocked")
+            return done(null, false, { message: "User is blocked" });
         }
         if (!isUserExist) {
             isUserExist = yield user_model_1.User.create({

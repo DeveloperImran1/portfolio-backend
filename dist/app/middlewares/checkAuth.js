@@ -16,12 +16,11 @@ exports.checkAuth = void 0;
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const env_1 = require("../../config/env");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
-const user_interface_1 = require("../modules/user/user.interface");
 const user_model_1 = require("../modules/user/user.model");
 const jwt_1 = require("../utils/jwt");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const accessToken = req.headers.authorization;
+        const accessToken = req.headers.authorization || req.cookies.accessToken;
         if (!accessToken) {
             throw new AppError_1.default(401, "Token not found");
         }
@@ -34,16 +33,8 @@ const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0
         if (!isUserExist) {
             throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User not found");
         }
-        // user verified, block or inactive hole or deleted hole error throw korbo.
-        if (!isUserExist.isVerified) {
-            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is not verified");
-        }
-        if (isUserExist.isActive === user_interface_1.IsActive.BLOCK ||
-            isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
-            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isUserExist.isActive}`);
-        }
-        if (isUserExist.isDeleted === true) {
-            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is Deleted");
+        if (isUserExist.isBlock === true) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is Blocked");
         }
         if (!authRoles.includes(verifiedToken.role)) {
             throw new AppError_1.default(403, "You are not permited to view this route!!");
