@@ -7,4 +7,9 @@ const createReaction = async (paylaod: IReaction, decodedToken: JwtPayload) => {
   return reaction;
 };
 
-export const ReactionServices = { createReaction };
+const allReactionWithBlogId = async (blogId: string) => {
+  const reaction = await Reaction.find({ blogId });
+  return reaction;
+};
+
+export const ReactionServices = { createReaction, allReactionWithBlogId };

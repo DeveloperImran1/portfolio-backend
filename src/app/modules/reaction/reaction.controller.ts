@@ -10,9 +10,6 @@ const createReaction = catchAsync(
     const decodedToken = req.user;
     const paylaod = { ...req.body, userId: decodedToken?.userId };
 
-    console.log('decoded token', decodedToken);
-    console.log('paylaod', paylaod);
-
     const reaction = await ReactionServices.createReaction(
       paylaod,
       decodedToken,
@@ -27,18 +24,18 @@ const createReaction = catchAsync(
   },
 );
 
-// const getSingleBlog = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const slug = req.params.slug;
-//     const blog = await BlogServices.getSingleBlog(slug);
+const allReactionWithBlogId = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const blogId = req.params.blogId;
+    const reaction = await ReactionServices.allReactionWithBlogId(blogId);
 
-//     sendResponse(res, {
-//       success: true,
-//       statusCode: httpStatus.OK,
-//       message: 'Blog retrived successfully',
-//       data: blog,
-//     });
-//   },
-// );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Blog Reaction retrived successfully',
+      data: reaction,
+    });
+  },
+);
 
-export const ReactionController = { createReaction };
+export const ReactionController = { createReaction, allReactionWithBlogId };
