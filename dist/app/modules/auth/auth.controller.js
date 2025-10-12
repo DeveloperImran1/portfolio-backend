@@ -37,8 +37,6 @@ const setCookie_1 = require("../../utils/setCookie");
 const userTokens_1 = require("../../utils/userTokens");
 const auth_service_1 = require("./auth.service");
 const credentialsLogin = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // AuthServices.credentialsLogin function er kajta nicher passport.ts file er maddhome kora hoiase. Tai ai line comment koresi.
-    // const loginInfo = await AuthServices.credentialsLogin(req.body);
     //credentialsLogin er maddhe jaja kortam, ta akhon passport.authentecation er moddhe korbo.
     passport_1.default.authenticate("local", (err, user, info) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
@@ -50,6 +48,7 @@ const credentialsLogin = (0, catchAsync_1.catchAsync)((req, res, next) => __awai
             // return next(err);
             return next(new AppError_1.default(401, err));
         }
+        console.log("body", req.body);
         if (!user) {
             return next(new AppError_1.default(401, info.message));
         }
@@ -146,7 +145,7 @@ const changePassword = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
     if (!newPassword || !oldPassword) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Old password and new password field is required");
     }
-    yield auth_service_1.AuthServices.resetPassword(req.body, decodedToken);
+    yield auth_service_1.AuthServices.changePassword(oldPassword, newPassword, decodedToken);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,

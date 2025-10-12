@@ -11,11 +11,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateRequest = void 0;
 const validateRequest = (zodSchema) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         // jokhon postman theke form-datar maddhome file and data property er moddhe info gulo send kortesi. Tokhon aikhane req.body er moddhe exact body ke pawa jabena. Tai req.body ke reset korlam req.body.data dia. Ar jeheto form-data theke text akare astece data. Tai string hisabe asce. So sei string data ke JSON.parse() er maddhome json a convert kore nita hobe. Ar jodi req.body.data na thake tar mane aita json akare asce. Tokhon direct zodSchema te check korte pathia dissi.
-        if (req.body.data) {
-            req.body = JSON.parse(req.body.data);
+        if ((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.data) {
+            req.body = JSON.parse((_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.data);
         }
+        // console.log("validation theke", req.body)
         req.body = yield zodSchema.parseAsync(req.body);
         next();
     }

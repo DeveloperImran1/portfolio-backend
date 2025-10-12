@@ -3,51 +3,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = require("express");
 const auth_route_1 = require("../modules/auth/auth.route");
-const booking_route_1 = require("../modules/booking/booking.route");
-const division_route_1 = require("../modules/division/division.route");
+const blog_route_1 = require("../modules/blog/blog.route");
+const comment_route_1 = require("../modules/comment/comment.route");
 const otp_route_1 = require("../modules/otp/otp.route");
-const payment_route_1 = require("../modules/payment/payment.route");
+const reaction_route_1 = require("../modules/reaction/reaction.route");
 const stats_route_1 = require("../modules/stats/stats.route");
-const tour_route_1 = require("../modules/tour/tour.route");
-const tourType_route_1 = require("../modules/tourType/tourType.route");
 const user_route_1 = require("../modules/user/user.route");
 exports.router = (0, express_1.Router)();
 const moduleRoutes = [
     {
-        path: "/user",
+        path: '/user',
         route: user_route_1.UserRoutes,
     },
     {
-        path: "/auth",
+        path: '/auth',
         route: auth_route_1.AuthRoutes,
     },
     {
-        path: "/division",
-        route: division_route_1.DivisionRoutes,
-    },
-    {
-        path: "/tour",
-        route: tourType_route_1.TourTypeRoutes,
-    },
-    {
-        path: "/tour",
-        route: tour_route_1.TourRoutes,
-    },
-    {
-        path: "/booking",
-        route: booking_route_1.BookingRoutes,
-    },
-    {
-        path: "/payment",
-        route: payment_route_1.PaymentRoutes,
-    },
-    {
-        path: "/otp",
+        path: '/otp',
         route: otp_route_1.OtpRoutes,
     },
     {
-        path: "/stats",
+        path: '/stats',
         route: stats_route_1.StatsRoutes,
+    },
+    {
+        path: '/blogs',
+        route: blog_route_1.BlogRoutes,
+    },
+    {
+        path: '/reaction',
+        route: reaction_route_1.ReactionRoute,
+    },
+    {
+        path: '/comment',
+        route: comment_route_1.CommentRoute,
     },
 ];
 moduleRoutes.forEach((route) => {

@@ -50,13 +50,12 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
 const updateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
     /**
      * email --> cannot update
-     * user can update : phone, password, name, address etc.
+     * user can update :  password, name etc.
      * password --> for update need rehashing
-     * Only admin and superAdmin can update isDeleted, role
-     * Only superAdmin can a user or admin to superAdmin
+     * Only admin can update isBlock, role
      */
-    // Admin and superAdmin je karo info update korte pare. But jodi role user or guide tahole se sudho nijer profile update korte parbe. Onno karo profile change korte parbena.
-    if (decodedToken.role == user_interface_1.Role.USER || decodedToken.role == user_interface_1.Role.GUIDE) {
+    // Admin and admin je karo info update korte pare. But jodi role user hoi tahole se sudho nijer profile update korte parbe. Onno karo profile change korte parbena.
+    if (decodedToken.role == user_interface_1.Role.USER) {
         if (userId !== decodedToken.userId) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorized");
         }
@@ -66,36 +65,23 @@ const updateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, 
     if (!isUserExist) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "User not exist");
     }
-    // Admin super admin bade je karo profile update korte parbe.
-    if (decodedToken.role === user_interface_1.Role.ADMIN &&
-        isUserExist.role === user_interface_1.Role.SUPER_ADMIN) {
-        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorized");
-    }
     // payload er moddhe role property thakle vitore dhukbe.
     if (payload.role) {
-        // decodedToken or request kora user er role jodi user ba guide hoi. Tahole role ke update korte parbena.
-        if (decodedToken.role === user_interface_1.Role.USER || decodedToken.role === user_interface_1.Role.GUIDE) {
+        // decodedToken or request kora user er role jodi user hoi. Tahole role ke update korte parbena.
+        if (decodedToken.role === user_interface_1.Role.USER) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorized");
         }
         // decodedToken or request kora user er role jodi admin hoi. Tahole superAdmin er kono kiso update korte parbena sei admin. Tai check kortesi payload a asa role er value ki superAdmin naki.
-        if (decodedToken.role === user_interface_1.Role.ADMIN && payload.role === user_interface_1.Role.SUPER_ADMIN) {
+        if (decodedToken.role === user_interface_1.Role.USER && payload.role === user_interface_1.Role.ADMIN) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorized");
         }
     }
     // isActive, isDeleted, isVerified property gulo sudho admin or super admin update korte parbe.
-    if (payload.isActive || payload.isDeleted || payload.isVerified) {
-        if (decodedToken.role === user_interface_1.Role.USER || decodedToken.role === user_interface_1.Role.GUIDE) {
+    if (payload.isBlock) {
+        if (decodedToken.role === user_interface_1.Role.USER) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorized");
         }
     }
-    // jodi password ke update korte chai, tahole payloead theke password ta nia encrypt kore abar paylaod a set kore kore diasi.
-    // ai kajta aikhane korbona. Karon password change korar jonno extra api ase. So schema thekew remove kortesi.
-    // if (payload.password) {
-    //   payload.password = await bcrypt.hash(
-    //     payload.password,
-    //     Number(envVars.BCRYPT_SALT_ROUND)
-    //   );
-    // }
     const newUpdatedUser = yield user_model_1.User.findByIdAndUpdate(userId, payload, {
         new: true, // update hoia updated info gulo newUpdatedUser er moddhe asbe.
         runValidators: true, // runValidators er maddhome mongoose er schema check kore update hobe. Ai property true na korle mongoose er schema check na kore set hoia jabe.
@@ -134,8 +120,8 @@ const getMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.UserServices = {
     createUser,
-    updateUser,
     getAllUser,
+    updateUser,
     getSingleUser,
     getMe,
 };

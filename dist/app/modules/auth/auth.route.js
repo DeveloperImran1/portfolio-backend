@@ -37,6 +37,7 @@ router.post("/forgot-password", auth_controller_1.AuthControllers.forgotPassword
 router.post("/reset-password", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), 
 // Aitar jonno zod validation korte hobe.
 auth_controller_1.AuthControllers.resetPassword);
+// Normaly login kora kono user profile update korar jonno, ager password dia  new password set korte parbe.
 router.post("/change-password", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), auth_controller_1.AuthControllers.changePassword);
 //  client side theke google dia login korar somoi, kono data pathate hobena, tai get route use kortesi. Tarpor 2nd perameter theke passport.authinticate ke call korese, jar fole config > passport.ts file exicute hobe. and google dia login hoia akta user create korbe. tarport /google/callback rout e requst korbe automatically.
 router.get("/google", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

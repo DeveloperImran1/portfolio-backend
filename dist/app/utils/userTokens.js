@@ -16,7 +16,6 @@ exports.createNewAccessTokenWithRefreshToken = exports.createUserTokens = void 0
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const env_1 = require("../../config/env");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
-const user_interface_1 = require("../modules/user/user.interface");
 const user_model_1 = require("../modules/user/user.model");
 const jwt_1 = require("./jwt");
 const createUserTokens = (user) => {
@@ -38,15 +37,10 @@ const createNewAccessTokenWithRefreshToken = (refreshToken) => __awaiter(void 0,
     // DB te oi email er user ase kina, check kortesi.
     const isUserExist = yield user_model_1.User.findOne({ email: verifiedRefreshToken.email });
     if (!isUserExist) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User not found");
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, 'User not found');
     }
-    // user block or inactive hole or deleted hole error throw korbo.
-    if (isUserExist.isActive === user_interface_1.IsActive.BLOCK ||
-        isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isUserExist.isActive}`);
-    }
-    if (isUserExist.isDeleted === true) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is Deleted");
+    if (isUserExist.isBlock === true) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, 'User is blocked');
     }
     // accessToke token create kore return kore dissi. Akhon controller er moddhe ai new accessToken ta cookie te reset kore diba and front-end a send korbe.
     const jwtPayload = {

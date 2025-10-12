@@ -39,7 +39,7 @@ const globalErrorHandler = (error, req, res, next) => __awaiter(void 0, void 0, 
     // multiple image delete korar jonno
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
         const imagesUrl = req.files.map((file) => file.path);
-        // aikhane Promise.all() method er moddhe loop chalia delete kora hoiase. Aikhane Promise.all() use korlw hoto. but time besi lagto. Karon akta url asbe delete request korbe fully delete hobe, then arekta image er url asbe and delete er request korbe. Thats mean akta ses hower por arekta suro hobe. Ar Promise.all() use korar fole all url er jonno request aksathe hobe. And cloudinary te aksathe multiple image delete hote thakbe. Aktar por akta noi. Tai loading kom hoi.
+        // aikhane Promise.all() method er moddhe loop chalia delete kora hoiase. Aikhane Promise.all() use na korlw hoto. but time besi lagto. Karon akta url asbe delete request korbe fully delete hobe, then arekta image er url asbe and delete er request korbe. Thats mean akta ses hower por arekta suro hobe. Ar Promise.all() use korar fole all url er jonno request aksathe hobe. And cloudinary te aksathe multiple image delete hote thakbe. Aktar por akta noi. Tai loading kom hoi.
         yield Promise.all(imagesUrl.map((url) => (0, cloudinary_config_1.deleteImageFromCloudinary)(url)));
     }
     let statusCode = 500;

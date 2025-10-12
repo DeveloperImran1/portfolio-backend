@@ -29,24 +29,24 @@ const generateOTP = (length = 6) => {
 const sendOTP = (email, name) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
-        throw new AppError_1.default(401, "User Not Found");
+        throw new AppError_1.default(401, 'User Not Found');
     }
-    if (user.isVerified) {
-        throw new AppError_1.default(401, "User Already verified");
-    }
+    // if (user?.isVerified) {
+    //   throw new AppError(401, 'User Already verified');
+    // }
     const otp = generateOTP();
     const redisKey = `otp:${email}`;
     yield redis_config_1.redisClient.set(redisKey, otp, {
         expiration: {
-            type: "EX",
+            type: 'EX',
             value: OTP_EXPIRATION, // expiration time second a dita hobe. Karon type: EX dara second bujhai. type er value milisecond ba minute ew set kora jai.
         },
     });
     // sendEmail er maddhome oi otp ta user ke send kora hosse. Aita amra redis websit a DB te create koresi, oikhane connect a click korle "Launch Redis Insight Web" button a click korle akta page open hobe. Seikhane otp ta store thakbe expiration time 2 minute porjonto. Tarpor delete hoia jabe.
     yield (0, sendEmail_1.sendEmail)({
         to: email,
-        subject: "Your OTP Code",
-        templateName: "otp",
+        subject: 'Your OTP Code',
+        templateName: 'otp',
         templateData: {
             name,
             otp,
@@ -57,19 +57,19 @@ const sendOTP = (email, name) => __awaiter(void 0, void 0, void 0, function* () 
 const verifyOTP = (email, otp) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
-        throw new AppError_1.default(401, "User Not Found");
+        throw new AppError_1.default(401, 'User Not Found');
     }
-    if (user.isVerified) {
-        throw new AppError_1.default(401, "User Already verified");
-    }
+    // if (user.isVerified) {
+    //   throw new AppError(401, 'User Already verified');
+    // }
     const redisKey = `otp:${email}`;
     // redis DB te find kortesi, ai key dia otp ase kina. Thakle get korbe. Aita localstorage er key value er moto kaj kore.
     const savedOTP = yield redis_config_1.redisClient.get(redisKey);
     if (!savedOTP) {
-        throw new AppError_1.default(401, "Invalid OTP");
+        throw new AppError_1.default(401, 'Invalid OTP');
     }
     if (savedOTP !== otp) {
-        throw new AppError_1.default(401, "Invalid OTP");
+        throw new AppError_1.default(401, 'Invalid OTP');
     }
     // aikhane update korar kaj and redis theke otp delete korar kaj ta ake oporer sathe dependent. Tai rollback er maddhome korte hoto. Or aivabe Promis.all([er moddhe korleww hobe.])
     yield Promise.all([

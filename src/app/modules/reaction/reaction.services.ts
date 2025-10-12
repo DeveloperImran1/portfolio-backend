@@ -1,8 +1,7 @@
-import { JwtPayload } from 'jsonwebtoken';
 import { IReaction } from './reaction.interface';
 import { Reaction } from './reaction.model';
 
-const createReaction = async (paylaod: IReaction, decodedToken: JwtPayload) => {
+const createReaction = async (paylaod: IReaction) => {
   const reaction = await Reaction.create(paylaod);
   return reaction;
 };
