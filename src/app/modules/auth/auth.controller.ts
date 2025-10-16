@@ -2,25 +2,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // Ai auth module er moddhe authenticaiton: login, logout, password reset etc kaj korbo. Aitar jonno extra vabe interface, model or schema create korte hobena. Ai schema, interface user model, interface dia hoia jabe.
 
-import { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status-codes";
-import { JwtPayload } from "jsonwebtoken";
-import passport from "passport";
-import { envVars } from "../../../config/env";
-import AppError from "../../errorHelpers/AppError";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { setAuthCookie } from "../../utils/setCookie";
-import { createUserTokens } from "../../utils/userTokens";
-import { AuthServices } from "./auth.service";
+import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status-codes';
+import { JwtPayload } from 'jsonwebtoken';
+import passport from 'passport';
+import { envVars } from '../../../config/env';
+import AppError from '../../errorHelpers/AppError';
+import { catchAsync } from '../../utils/catchAsync';
+import { sendResponse } from '../../utils/sendResponse';
+import { setAuthCookie } from '../../utils/setCookie';
+import { createUserTokens } from '../../utils/userTokens';
+import { AuthServices } from './auth.service';
 
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
-
     //credentialsLogin er maddhe jaja kortam, ta akhon passport.authentecation er moddhe korbo.
 
-    passport.authenticate("local", async (err: any, user: any, info: any) => {
+    passport.authenticate('local', async (err: any, user: any, info: any) => {
       if (err) {
         // ❌❌❌❌ aivaime error throw kora jabena.
         // throw new AppError(402, "Something went wrong")
@@ -32,7 +30,7 @@ const credentialsLogin = catchAsync(
         return next(new AppError(401, err));
       }
 
-          console.log("body", req.body)
+      console.log('body', req.body);
       if (!user) {
         return next(new AppError(401, info.message));
       }
@@ -49,7 +47,7 @@ const credentialsLogin = catchAsync(
       sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "User loged in successfull!",
+        message: 'User loged in successfull!',
         data: {
           accessToken: userTokens.accessToken,
           refreshToken: userTokens.refreshToken,
@@ -57,7 +55,7 @@ const credentialsLogin = catchAsync(
         },
       });
     })(req, res, next); // credentials login aikhane middleware hisabe kaj kortese. but passport.authenticate() oi middleware er moddhe thaka arekti function. So aitake amader call korte hobe. Tasara hobena.
-  }
+  },
 );
 
 const getNewAccessToken = catchAsync(
@@ -67,11 +65,11 @@ const getNewAccessToken = catchAsync(
     if (!refreshToken) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "No refresh token recived from cookies"
+        'No refresh token recived from cookies',
       );
     }
     const tokenInfo = await AuthServices.getNewAccessToken(
-      refreshToken as string
+      refreshToken as string,
     );
 
     // refresh token er moaddhome jokhon new token create korteci, tokhon sei token ta responce hisabe client side a pathassi. But cookie te new access-token ta set kore dita hobe. Tai aikhane res send korar age updated token ta cookie te set kore disi.
@@ -80,33 +78,46 @@ const getNewAccessToken = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "New Access Token Retrived Successfully",
+      message: 'New Access Token Retrived Successfully',
       data: tokenInfo,
     });
-  }
+  },
 );
 
 const logout = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     // Kono user Login ase kina seita ensure hote pari, browser er cookie te accessToken and refreshToken ase kina. Seita check kori. So logout korar jonno accessToken and refreshToken remove korte parle kella fote.
-    res.clearCookie("accessToken", {
+
+    res.clearCookie('accessToken', {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+
+      // localhost a aivabe dita hobe
+      // secure: false,
+      // sameSite: 'lax',
+
+      // code live a jawer pore
+      secure: true,
+      sameSite: 'none',
     });
-    res.clearCookie("refreshToken", {
+    res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+
+      // localhost a aivabe dita hobe
+      // secure: false,
+      // sameSite: 'lax',
+
+      // code live a jawer pore
+      secure: true,
+      sameSite: 'none',
     });
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Logged Out Successfully",
+      message: 'Logged Out Successfully',
       data: null,
     });
-  }
+  },
 );
 
 const resetPassword = catchAsync(
@@ -118,10 +129,10 @@ const resetPassword = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Password Reset Successfully",
+      message: 'Password Reset Successfully',
       data: null,
     });
-  }
+  },
 );
 
 const setPassword = catchAsync(
@@ -134,10 +145,10 @@ const setPassword = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Password set Successfully",
+      message: 'Password set Successfully',
       data: null,
     });
-  }
+  },
 );
 
 const forgotPassword = catchAsync(
@@ -149,10 +160,10 @@ const forgotPassword = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Email Send Successfully",
+      message: 'Email Send Successfully',
       data: null,
     });
-  }
+  },
 );
 
 const changePassword = catchAsync(
@@ -163,24 +174,26 @@ const changePassword = catchAsync(
     const newPassword = req?.body?.newPassword;
     const oldPassword = req?.body?.oldPassword;
 
-
-
     if (!newPassword || !oldPassword) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "Old password and new password field is required"
+        'Old password and new password field is required',
       );
     }
 
-    await AuthServices.changePassword(oldPassword, newPassword, decodedToken as JwtPayload);
+    await AuthServices.changePassword(
+      oldPassword,
+      newPassword,
+      decodedToken as JwtPayload,
+    );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Password Reset Successfully",
+      message: 'Password Reset Successfully',
       data: null,
     });
-  }
+  },
 );
 
 const googleCallbackcontroller = catchAsync(
@@ -189,13 +202,13 @@ const googleCallbackcontroller = catchAsync(
     const user = req.user;
 
     // google dia login korar korar somoi route a state namer akta property er moddhe redirect path te set koreci, jar fole aikhane query theke state name a value ta pabo.
-    let redirectTo = req.query.state ? (req.query.state as string) : "";
-    if (redirectTo.startsWith("/")) {
+    let redirectTo = req.query.state ? (req.query.state as string) : '';
+    if (redirectTo.startsWith('/')) {
       redirectTo = redirectTo.slice(1);
     }
 
     if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
     // user thakle user er moddhe email, name, _id, role etc. ase. Oi user er value dia createUserTokens() function accessToken and refreshToken create kore diba.
@@ -213,7 +226,7 @@ const googleCallbackcontroller = catchAsync(
 
     // login hower pore front-end a res send korte hobena. redirect kore dilai hobe. Akhon redirectTo er value thakle user er exptectation route a redirect korbe. ar redirectTo empty string hole home page a redirect korbe.
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
-  }
+  },
 );
 
 export const AuthControllers = {
