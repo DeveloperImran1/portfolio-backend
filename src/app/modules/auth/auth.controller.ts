@@ -30,7 +30,6 @@ const credentialsLogin = catchAsync(
         return next(new AppError(401, err));
       }
 
-      console.log('body', req.body);
       if (!user) {
         return next(new AppError(401, info.message));
       }

@@ -1,31 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status-codes";
-import { JwtPayload } from "jsonwebtoken";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { UserServices } from "./user.service";
-
+import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status-codes';
+import { JwtPayload } from 'jsonwebtoken';
+import { catchAsync } from '../../utils/catchAsync';
+import { sendResponse } from '../../utils/sendResponse';
+import { setAuthCookie } from '../../utils/setCookie';
+import { createUserTokens } from '../../utils/userTokens';
+import { UserServices } from './user.service';
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("body is ", req.body)
+    console.log('body is ', req.body);
     const user = await UserServices.createUser(req.body);
+
+    // user thakle user er info dia token create
+    const userTokens = createUserTokens(user);
+
+    // cookie te set kortesi
+    setAuthCookie(res, userTokens);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "User created Successfully",
+      message: 'User created Successfully',
       data: user,
     });
-  }
+  },
 );
 
 const updateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
-    const payload = {...req.body, picture: req.file?.path};
+    const payload = { ...req.body, picture: req.file?.path };
 
     const verifiedToken: any = req.user;
 
@@ -35,26 +42,26 @@ const updateUser = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "User Updated Successfully",
+      message: 'User Updated Successfully',
       data: user,
     });
-  }
+  },
 );
 
 // get all users
 const getAllUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const data = await UserServices.getAllUser(
-      req.query as Record<string, string>
+      req.query as Record<string, string>,
     );
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "User retrived Successfully",
+      message: 'User retrived Successfully',
       data,
     });
-  }
+  },
 );
 
 const getSingleUser = catchAsync(
@@ -65,10 +72,10 @@ const getSingleUser = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "User retrived successfully",
+      message: 'User retrived successfully',
       data: user,
     });
-  }
+  },
 );
 
 const getMe = catchAsync(
@@ -79,10 +86,10 @@ const getMe = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "User retrived successfully",
+      message: 'User retrived successfully',
       data: user,
     });
-  }
+  },
 );
 
 export const UserControllers = {

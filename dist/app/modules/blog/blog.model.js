@@ -61,7 +61,8 @@ const blogSchema = new mongoose_1.Schema({
 // 🧠 1️⃣ Slug auto-generate before saving
 blogSchema.pre('save', function (next) {
     if (!this.slug) {
-        this.slug = this.title.toLowerCase().replace(/\s+/g, '-');
+        const uniqueSlug = this.title.toLowerCase().replace(/\s+/g, '-');
+        this.slug = `${uniqueSlug}-${new Date().getMilliseconds()}`;
     }
     next();
 });

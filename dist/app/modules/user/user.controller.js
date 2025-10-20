@@ -16,14 +16,20 @@ exports.UserControllers = void 0;
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const catchAsync_1 = require("../../utils/catchAsync");
 const sendResponse_1 = require("../../utils/sendResponse");
+const setCookie_1 = require("../../utils/setCookie");
+const userTokens_1 = require("../../utils/userTokens");
 const user_service_1 = require("./user.service");
 const createUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("body is ", req.body);
+    console.log('body is ', req.body);
     const user = yield user_service_1.UserServices.createUser(req.body);
+    // user thakle user er info dia token create
+    const userTokens = (0, userTokens_1.createUserTokens)(user);
+    // cookie te set kortesi
+    (0, setCookie_1.setAuthCookie)(res, userTokens);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "User created Successfully",
+        message: 'User created Successfully',
         data: user,
     });
 }));
@@ -37,7 +43,7 @@ const updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "User Updated Successfully",
+        message: 'User Updated Successfully',
         data: user,
     });
 }));
@@ -47,7 +53,7 @@ const getAllUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "User retrived Successfully",
+        message: 'User retrived Successfully',
         data,
     });
 }));
@@ -57,7 +63,7 @@ const getSingleUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "User retrived successfully",
+        message: 'User retrived successfully',
         data: user,
     });
 }));
@@ -67,7 +73,7 @@ const getMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0,
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "User retrived successfully",
+        message: 'User retrived successfully',
         data: user,
     });
 }));

@@ -12,6 +12,6 @@ const router = (0, express_1.Router)();
 router.post('/', (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), multer_config_1.multerUpload.single('file'), (0, validateRequest_1.validateRequest)(blog_validation_1.createBlogZodSchema), blog_controller_1.BlogController.createBlog);
 router.patch('/:id', (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), multer_config_1.multerUpload.single('file'), (0, validateRequest_1.validateRequest)(blog_validation_1.updateBlogZodSchema), blog_controller_1.BlogController.updateBlog);
 router.delete('/:id', (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), blog_controller_1.BlogController.deleteBlog);
-router.get('/', (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), blog_controller_1.BlogController.getAllBlog);
-router.get('/:slug', (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), blog_controller_1.BlogController.getSingleBlog);
+router.get('/', blog_controller_1.BlogController.getAllBlog);
+router.get('/:slug', blog_controller_1.BlogController.getSingleBlog);
 exports.BlogRoutes = router;

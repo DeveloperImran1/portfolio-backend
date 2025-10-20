@@ -1,9 +1,24 @@
 import httpStatus from 'http-status-codes';
 import AppError from '../../errorHelpers/AppError';
+import { Blog } from '../blog/blog.model';
 import { IComment } from './comment.interface';
 import { Comment } from './comment.model';
 
 const createComment = async (paylaod: IComment) => {
+  const isBlogExist = await Blog.findById(paylaod?.blogId);
+  if (!isBlogExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This blog not exist');
+  }
+  const commentCount = Number(isBlogExist?.commentCount) + 1;
+  await Blog.findByIdAndUpdate(
+    paylaod?.blogId,
+    { commentCount },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
   const comment = await Comment.create(paylaod);
   return comment;
 };

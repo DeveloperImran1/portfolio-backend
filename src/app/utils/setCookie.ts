@@ -1,5 +1,4 @@
-import { Response } from "express";
-import { envVars } from "../../config/env";
+import { Response } from 'express';
 
 export interface AuthTokens {
   refreshToken?: string;
@@ -9,19 +8,31 @@ export interface AuthTokens {
 export const setAuthCookie = (res: Response, tokenInfo: AuthTokens) => {
   // refresh token jemon rakhlam, thik temoni access token kew cookie te rakhbo. Bivinno somoi need porbe.
   if (tokenInfo.accessToken) {
-    res.cookie("accessToken", tokenInfo.accessToken, {
+    res.cookie('accessToken', tokenInfo.accessToken, {
       httpOnly: true,
-      secure: envVars.NODE_ENV === "production",
-      sameSite: "none", // deploy korar por ai property add koresi.But localshost a aita thaklew somossa nai maybe.
+
+      // localhost a aivabe dita hobe
+      // secure: false,
+      // sameSite: 'lax',
+
+      // code live a jawer pore
+      secure: true,
+      sameSite: 'none',
     });
   }
 
   // successfully login hole loginInfo er moddhe access-token and refresh-token thakbe. Seikhan theke refresh token ke client side er browser a coockies er moddhe set kore dita hobe. Jehto postman theke try korbo. Tai ai refreshToken postman er coockie teo set hobe.
   if (tokenInfo.refreshToken) {
-    res.cookie("refreshToken", tokenInfo.refreshToken, {
+    res.cookie('refreshToken', tokenInfo.refreshToken, {
       httpOnly: true,
-      secure: envVars.NODE_ENV === "production",
-      sameSite: "none",
+
+      // localhost a aivabe dita hobe
+      // secure: false,
+      // sameSite: 'lax',
+
+      // code live a jawer pore
+      secure: true,
+      sameSite: 'none',
     });
   }
 };

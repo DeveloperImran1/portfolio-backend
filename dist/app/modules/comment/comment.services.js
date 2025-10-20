@@ -15,8 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentServices = void 0;
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
+const blog_model_1 = require("../blog/blog.model");
 const comment_model_1 = require("./comment.model");
 const createComment = (paylaod) => __awaiter(void 0, void 0, void 0, function* () {
+    const isBlogExist = yield blog_model_1.Blog.findById(paylaod === null || paylaod === void 0 ? void 0 : paylaod.blogId);
+    if (!isBlogExist) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, 'This blog not exist');
+    }
+    const commentCount = Number(isBlogExist === null || isBlogExist === void 0 ? void 0 : isBlogExist.commentCount) + 1;
+    yield blog_model_1.Blog.findByIdAndUpdate(paylaod === null || paylaod === void 0 ? void 0 : paylaod.blogId, { commentCount }, {
+        new: true,
+        runValidators: true,
+    });
     const comment = yield comment_model_1.Comment.create(paylaod);
     return comment;
 });
